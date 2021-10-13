@@ -22,7 +22,26 @@ app_ui <- function(request) {
         f7Tabs(
           id = "f7_tabs",
 
-          mod_inputs_ui("inputs_ui_1"),
+          f7Tab(
+            tabName = "inputs",
+            icon = f7Icon("calendar_badge_plus"),
+            active = TRUE,
+
+            ## date picker ----
+            f7DatePicker(
+              inputId = "date",
+              label = "today's date",
+              value = Sys.Date(),
+              multiple = FALSE,
+              dateFormat = "mm/dd/yyyy",
+              closeByOutsideClick = TRUE
+            ),
+
+            ## button row ----
+            mod_button_row_ui("button_row_ui_1"),
+            mod_popup_box_ui("popup_box_ui_1", var = 20)
+          ),
+
           mod_monitor_ui("monitor_ui_1"),
           mod_settings_ui("settings_ui_1")
 
@@ -41,7 +60,7 @@ app_ui <- function(request) {
         ),
         iosTranslucentBars = TRUE,
         navbar = list(
-          iosCenterTitle = TRUE,
+          iosCenterTitle = FALSE,
           hideNavOnPageScroll = TRUE
         ),
         toolbar = list(

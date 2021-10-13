@@ -18,6 +18,7 @@
 usethis::use_package( "DT" )
 usethis::use_package( "dplyr" )
 usethis::use_package( "installr" )
+usethis::use_package( "logger" )
 usethis::use_package( "magrittr" )
 usethis::use_package( "shiny" )
 usethis::use_package( "shinyjs" )
@@ -31,7 +32,8 @@ golem::add_module( name = "inputs" ) # Name of the module
 golem::add_module( name = "monitor" ) # Name of the module
 golem::add_module( name = "settings" )
 
-golem::add_module( name = "food_box" )
+golem::add_module( name = "button_row" )
+golem::add_module( name = "popup_box" )
 
 ## Add helper functions ----
 ## Creates fct_* and utils_*
