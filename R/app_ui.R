@@ -2,6 +2,7 @@
 #'
 #' @param request Internal parameter for `{shiny}`.
 #'     DO NOT REMOVE.
+#' @importFrom golem get_golem_options
 #' @import shiny
 #' @import shinyMobile
 #' @import shinyWidgets
@@ -38,12 +39,14 @@ app_ui <- function(request) {
             ),
 
             ## button row ----
-            mod_button_row_ui("button_row_ui_1"),
-            mod_popup_box_ui("popup_box_ui_1", var = 20)
+            mod_button_row_ui("buttons"),
+            mod_popup_box_ui("food_vars"),
+            mod_popup_box_ui("play_vars"),
+            mod_popup_box_ui("poop_vars")
           ),
 
-          mod_monitor_ui("monitor_ui_1"),
-          mod_settings_ui("settings_ui_1")
+          mod_monitor_ui("monitor"),
+          mod_settings_ui("settings")
 
         )
       ),
@@ -79,9 +82,10 @@ app_ui <- function(request) {
 #' resources inside the Shiny application.
 #'
 #' @import shiny
+#' @importFrom shinyjs useShinyjs
 #' @importFrom golem add_resource_path activate_js favicon bundle_resources
 #' @noRd
-golem_add_external_resources <- function(){
+golem_add_external_resources <- function() {
 
   add_resource_path(
     'www', app_sys('app/www')
@@ -92,7 +96,8 @@ golem_add_external_resources <- function(){
     bundle_resources(
       path = app_sys('app/www'),
       app_title = 'kpthor'
-    )
+    ),
+    useShinyjs()
     # Add here other external resources
     # for example, you can add shinyalert::useShinyalert()
   )

@@ -9,66 +9,51 @@
 #' @importFrom shiny NS tagList
 #' @import shinyMobile
 #'
-mod_popup_box_ui <- function(id, vars) {
+mod_popup_box_ui <- function(id) {
   ns <- NS(id)
   ## food sheet ----
   tagList(
     f7Sheet(
       id = ns("sheet"),
-      label = "food/water",
+      label = paste0(names(get_golem_options(id)), collapse = "/"),
       orientation = "bottom",
       swipeToClose = TRUE,
       swipeToStep = FALSE,
       closeByOutsideClick = TRUE,
       backdrop = FALSE,
       tagList(
-        h4("food"),
-        f7Row(
-          f7Col(
-            f7Stepper(
-              inputId = ns("food"),
-              label = NULL,
-              min = 0,
-              max = 5,
-              step = 0.5,
-              value = 2.5,
-              color = "teal"
+        lapply(
+          seq_along(get_golem_options(id)),
+          function(x) {
+            tagList(
+              h4(names(get_golem_options(id))[x]),
+              f7Row(
+                f7Col(
+                  f7Stepper(
+                    inputId = ns(names(get_golem_options(id))[x]),
+                    label = NULL,
+                    min = get_golem_options(id)[[x]]$min,
+                    max = get_golem_options(id)[[x]]$max,
+                    step = get_golem_options(id)[[x]]$step,
+                    value = get_golem_options(id)[[x]]$value,
+                    color = get_golem_options(id)[[x]]$color
+                  )
+                ),
+                f7Col(
+                  f7Button(
+                    inputId = ns(paste(names(get_golem_options(id))[x], "submit", sep = "_")),
+                    label = "submit",
+                    size = "small",
+                    color = get_golem_options(id)[[x]]$color,
+                    fill = FALSE
+                  )
+                )
+              )
             )
-          ),
-          f7Col(
-            f7Button(
-              inputId = ns("food_submit"),
-              label = "submit",
-              size = "small",
-              color = "teal",
-              fill = FALSE
-            )
-          )
+          }
         ),
-        h4("water"),
-        f7Row(
-          f7Col(
-            f7Stepper(
-              inputId = ns("water"),
-              label = NULL,
-              min = 0,
-              max = 5,
-              step = 0.5,
-              value = 1.0,
-              color = "lightblue"
-            )
-          ),
-          f7Col(
-            f7Button(
-              inputId = ns("water_submit"),
-              label = "submit",
-              size = "small",
-              color = "lightblue",
-              fill = FALSE
-            )
-          )
-        ),
-        br(), br(),
+        br(),
+        br(),
         f7Row(
           f7Col(
             f7Button(
@@ -94,13 +79,36 @@ mod_popup_box_ui <- function(id, vars) {
 #'
 #' @noRd
 mod_popup_box_server <- function(id, sheet_trigger) {
-  stopifnot(is.list(sheet_trigger))
-  stopifnot(is.reactive(sheet_trigger$food))
+  stopifnot(is.reactive(sheet_trigger))
 
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
 
-    observeEvent(sheet_trigger$food(), updateF7Sheet("sheet"))
+    observeEvent(
+      eventExpr = sheet_trigger(),
+      handlerExpr = {
+        updateF7Sheet("sheet")
+      }
+    )
+
+    observeEvent(
+      eventExpr = input$cancel,
+      handlerExpr = {
+        shinyjs::hide("sheet")
+      }
+    )
+
+    observeEvent(
+      eventExpr = input$confirm,
+      handlerExpr = {
+        message(
+          paste0(
+            "val:", input[[names(get_golem_options(id))[[1]]]],
+            "val:", input[[names(get_golem_options(id))[[2]]]]
+          )
+        )
+      }
+    )
 
   })
 }

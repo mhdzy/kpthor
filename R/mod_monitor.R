@@ -7,7 +7,7 @@
 #' @noRd
 #'
 #' @importFrom shiny NS tagList
-mod_monitor_ui <- function(id){
+mod_monitor_ui <- function(id) {
   ns <- NS(id)
   f7Tab(
     tabName = "monitor",
@@ -18,8 +18,8 @@ mod_monitor_ui <- function(id){
 #' monitor Server Functions
 #'
 #' @noRd
-mod_monitor_server <- function(id){
-  moduleServer( id, function(input, output, session){
+mod_monitor_server <- function(id) {
+  moduleServer(id, function(input, output, session) {
     ns <- session$ns
 
   })

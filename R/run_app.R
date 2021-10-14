@@ -24,9 +24,18 @@ run_app <- function(
       uiPattern = uiPattern
     ),
     golem_opts = list(
-      theme = "ios",
-      dark = TRUE,
-      color = "#fff80f"
+      food_vars = list(
+        food = uvars(0, 5, 0.5, 2.5, "teal"),
+        water = uvars(0, 5, 0.5, 1.0, "lightblue")
+      ),
+      play_vars = list(
+        play = uvars(0L, 60L, 5L, 30L, "deeppurple"),
+        walk = uvars(0L, 90L, 5L, 15L, "orange")
+      ),
+      poop_vars = list(
+        poop = uvars(0L, 3L, 1L, 1L, "deeporange"),
+        pee = uvars(0L, 3L, 1L, 1L, "yellow")
+      )
     )
   )
 }

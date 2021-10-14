@@ -15,15 +15,18 @@
 
 ## Dependencies ----
 ## Add one line by package you want to add as dependency
+usethis::use_package( "DBI" )
 usethis::use_package( "DT" )
 usethis::use_package( "dplyr" )
 usethis::use_package( "installr" )
 usethis::use_package( "logger" )
 usethis::use_package( "magrittr" )
+usethis::use_package( "RPostgres" )
 usethis::use_package( "shiny" )
 usethis::use_package( "shinyjs" )
 usethis::use_package( "shinyMobile" )
 usethis::use_package( "shinyWidgets" )
+usethis::use_package( "stringi" )
 usethis::use_package( "tibble" )
 
 ## Add modules ----
@@ -37,8 +40,8 @@ golem::add_module( name = "popup_box" )
 
 ## Add helper functions ----
 ## Creates fct_* and utils_*
-golem::add_fct( "helpers" )
-golem::add_utils( "helpers" )
+golem::add_fct( "db" )
+golem::add_utils( "vars" )
 
 ## External resources
 ## Creates .js and .css files at inst/app/www

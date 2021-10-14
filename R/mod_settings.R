@@ -7,7 +7,8 @@
 #' @noRd
 #'
 #' @importFrom shiny NS tagList
-mod_settings_ui <- function(id){
+#' @import shinyMobile
+mod_settings_ui <- function(id) {
   ns <- NS(id)
   f7Tab(
     tabName = "settings",
@@ -19,7 +20,7 @@ mod_settings_ui <- function(id){
 #'
 #' @noRd
 mod_settings_server <- function(id){
-  moduleServer( id, function(input, output, session){
+  moduleServer(id, function(input, output, session) {
     ns <- session$ns
 
   })
