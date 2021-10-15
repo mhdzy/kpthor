@@ -14,11 +14,11 @@ Imports:
     magrittr,
     pkgload,
     processx,
+    R6,
     RPostgres,
     shiny (>= 1.6.0),
     shinyjs,
     shinyMobile,
-    shinyWidgets,
     stringi,
     tibble
 Encoding: UTF-8

@@ -6,9 +6,9 @@
 #'
 #' @noRd
 #'
-#' @importFrom shiny NS tagList
-#' @import shinyMobile
-#'
+#' @importFrom golem get_golem_options
+#' @importFrom shiny NS tagList br h4
+#' @importFrom shinyMobile f7Sheet f7Row f7Col f7Stepper f7Button
 mod_popup_box_ui <- function(id) {
   ns <- NS(id)
   ## food sheet ----
@@ -78,6 +78,11 @@ mod_popup_box_ui <- function(id) {
 #' popup_box Server Functions
 #'
 #' @noRd
+#'
+#' @importFrom golem get_golem_options
+#' @importFrom shiny moduleServer is.reactive observeEvent
+#' @importFrom shinyjs hide
+#' @importFrom shinyMobile updateF7Sheet
 mod_popup_box_server <- function(id, sheet_trigger) {
   stopifnot(is.reactive(sheet_trigger))
 
@@ -101,12 +106,18 @@ mod_popup_box_server <- function(id, sheet_trigger) {
     observeEvent(
       eventExpr = input$confirm,
       handlerExpr = {
-        message(
-          paste0(
-            "val:", input[[names(get_golem_options(id))[[1]]]],
-            "val:", input[[names(get_golem_options(id))[[2]]]]
-          )
+        dbi <- get_golem_options("dbi")
+        nams <- names(get_golem_options(id))
+        vals <- unlist(lapply(nams, function(x) input[[x]]))
+        df <- data.frame(
+          timestamp = Sys.time(),
+          pet = get_golem_options("pet"),
+          action = nams,
+          value = vals
         )
+        print(df)
+        dbi$append("kpthor", "events", df)
+        logger::log_debug("appended ", nrow(df), " rows to kpthor.events")
       }
     )
 

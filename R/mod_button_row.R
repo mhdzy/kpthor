@@ -8,7 +8,6 @@
 #'
 #' @importFrom shiny NS tagList
 #' @importFrom shinyMobile f7Row f7Col f7Button
-#'
 mod_button_row_ui <- function(id) {
   ns <- NS(id)
   tagList(
@@ -42,8 +41,7 @@ mod_button_row_ui <- function(id) {
 #'
 #' @noRd
 #'
-#' @import shiny
-#'
+#' @importFrom shiny moduleServer reactive
 mod_button_row_server <- function(id) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns

@@ -2,11 +2,12 @@
 #'
 #' @param request Internal parameter for `{shiny}`.
 #'     DO NOT REMOVE.
-#' @importFrom golem get_golem_options
-#' @import shiny
-#' @import shinyMobile
-#' @import shinyWidgets
+#'
 #' @noRd
+#'
+#' @importFrom golem get_golem_options
+#' @importFrom shiny tagList h2
+#' @importFrom shinyMobile f7Page f7TabLayout f7Navbar f7Tabs f7Tab f7Icon f7DatePicker
 app_ui <- function(request) {
   tagList(
     # Leave this function for adding external resources
@@ -81,10 +82,10 @@ app_ui <- function(request) {
 #' This function is internally used to add external
 #' resources inside the Shiny application.
 #'
-#' @import shiny
+#' @noRd
+#'
 #' @importFrom shinyjs useShinyjs
 #' @importFrom golem add_resource_path activate_js favicon bundle_resources
-#' @noRd
 golem_add_external_resources <- function() {
 
   add_resource_path(

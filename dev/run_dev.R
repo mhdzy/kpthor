@@ -16,7 +16,7 @@ system("R -e \"shiny::runApp('app.R', port = 3838)\"", wait = FALSE)
 test_pid <- system("ps aux | grep \"R -e shiny::runApp\" | awk '{print $2}'", intern = TRUE)
 
 # let app boot up
-Sys.sleep(2)
+Sys.sleep(3)
 
 # run test in separate window
 shinyMobile::preview_mobile(

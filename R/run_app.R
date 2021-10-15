@@ -7,6 +7,7 @@
 #' @export
 #' @importFrom shiny shinyApp
 #' @importFrom golem with_golem_options
+#' @importFrom RPostgres Postgres
 run_app <- function(
   onStart = NULL,
   options = list(),
@@ -24,6 +25,15 @@ run_app <- function(
       uiPattern = uiPattern
     ),
     golem_opts = list(
+      pet = "kashi",
+      dbi = dbInterface$new(
+        drv = RPostgres::Postgres(),
+        host = "192.168.0.111",
+        port = 5432,
+        user = "pi",
+        pass = "blueberry",
+        db = "apps"
+      ),
       food_vars = list(
         food = uvars(0, 5, 0.5, 2.5, "teal"),
         water = uvars(0, 5, 0.5, 1.0, "lightblue")

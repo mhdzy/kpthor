@@ -4,10 +4,11 @@
 #'
 #' @param id,input,output,session Internal parameters for {shiny}.
 #'
+#' @importFrom shiny NS tagList
+#' @importFrom shinyMobile f7Tab f7Icon
+#'
 #' @noRd
 #'
-#' @importFrom shiny NS tagList
-#' @import shinyMobile
 mod_settings_ui <- function(id) {
   ns <- NS(id)
   f7Tab(
@@ -18,7 +19,10 @@ mod_settings_ui <- function(id) {
 
 #' settings Server Functions
 #'
+#' @importFrom shiny moduleServer
+#'
 #' @noRd
+#'
 mod_settings_server <- function(id){
   moduleServer(id, function(input, output, session) {
     ns <- session$ns

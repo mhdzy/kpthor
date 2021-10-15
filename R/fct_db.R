@@ -1,25 +1,18 @@
-#' getConnection
+#' dbInterface
 #'
-#' @description A fct function
+#' @description An R6 class used to interface with a database. Provides
+#' wrapper functions for common database operations, such as querying, creating
+#' tables, appending and writing to tables,
 #'
 #' @return The return value, if any, from executing the function.
 #'
-#' @importFrom DBI dbConnect
-#' @importFrom RPostgres Postgres
-#'
-#' @noRd
-
-dbi <- dbInterface$new(
-  drv = RPostgres::Postgres(),
-  host = "192.168.0.111",
-  port = 5432,
-  user = "pi",
-  pass = "blueberry",
-  db = "apps"
-)
-
+#' @importFrom DBI Id dbConnect dbDisconnect
+#' @importFrom DBI dbGetQuery dbExecute dbCreateTable dbWriteTable
+#' @importFrom R6 R6Class
+#' @importFrom stringi stri_replace_all
 dbInterface <- R6::R6Class(
   classname = "dbInterface",
+
   private = list(
     driver = NA,
     host = NA_character_,
@@ -27,10 +20,21 @@ dbInterface <- R6::R6Class(
     user = NA_character_,
     pass = NA_character_,
     db   = NA_character_,
-
     connection = NA
   ),
+
   public = list(
+
+    #'
+    #' @param drv A database connection driver.
+    #' @param host A hostname to connect to.
+    #' @param port A port to connect to.
+    #' @param user A database username.
+    #' @param pass A password to use to authenticate the user.
+    #' @param db A database name to connect to.
+    #'
+    #' @return self
+    #'
     initialize = function(drv, host, port, user, pass, db) {
       self$set("driver", drv)
       self$set("host", host)
@@ -46,29 +50,32 @@ dbInterface <- R6::R6Class(
         },
         error = function(e) stop("could not initialize a db connection")
       )
+
+      invisible(self)
     },
 
-    #' get
     #'
-    #' Obtains the value of a private variable.
+    #' @param var A variable name to get.
+    #'
+    #' @return The private variable value.
     #'
     get = function(var) {
       return(private[[var]])
     },
 
-    #' set
     #'
-    #' Allows the setting of an existing private variable.
+    #' @param var A variable name to set.
+    #' @param val A variable value to set.
+    #'
+    #' @return self
     #'
     set = function(var, val) {
       private[[var]] <- val
+      invisible(self)
     },
 
-    #' connect
     #'
-    #' Connects to the database parameterized by the private variables.
-    #'
-    #' @importFrom DBI dbConnect
+    #' @return self
     #'
     connect = function() {
       self$set(
@@ -82,43 +89,17 @@ dbInterface <- R6::R6Class(
           dbname = self$get("db")
         )
       )
+      invisible(self)
     },
 
-    #' disconnect
     #'
-    #' Disconnects the connection stored in the private variable 'connection'.
-    #'
-    #' @importFrom DBI dbDisconnect
+    #' @return self
     #'
     disconnect = function() {
       DBI::dbDisconnect(self$get("connection"))
+      invisible(self)
     },
 
-    #' query
-    #'
-    #' Runs a SQL query against the database connection.
-    #'
-    #' @param sql A SQL query.
-    #'
-    #' @return The results of the query.
-    #'
-    #' @importFrom DBI dbGetQuery
-    #'
-    query = function(sql) {
-      self$connect()
-      res <- DBI::dbGetQuery(
-        conn = self$get("connection"),
-        statement = sql
-      )
-      self$disconnect()
-      return(res)
-    },
-
-    #' generic
-    #'
-    #' Performs a connect/(query) function/disconnect procedure and returns
-    #' the result. This is a wrapper for all db functions since it provides a
-    #' way to prevent orphaned but open db connections.
     #'
     #' @param fn A function to call.
     #' @param params A list of named parameters to pass to `fn`.
@@ -132,69 +113,84 @@ dbInterface <- R6::R6Class(
       return(res)
     },
 
-    #' create
     #'
-    #' Creates a table.
+    #' @param sql A SQL query.
+    #'
+    #' @return The results of the query.
+    #'
+    query = function(sql) {
+      self$generic(
+        fn = DBI::dbGetQuery,
+        list(
+          conn = self$get("connection"),
+          statement = self$onelineq(sql)
+        )
+      )
+    },
+
+    #'
+    #' @param sql
+    #'
+    #' @return The results of the execute.
+    #'
+    execute = function(sql) {
+      self$generic(
+        fn = DBI::dbExecute,
+        params = list(
+          conn = self$get("connection"),
+          statement = self$onelineq(sql),
+        )
+      )
+    },
+
     #'
     #' @param schema A schema name to create the table in. Defaults to "public".
     #' @param table A table name to create.
     #' @param fields A named vector: names are column names, values are types.
     #'
-    #' @importFrom DBI Id dbCreateTable
-    #'
     create = function(schema = "public", table, fields) {
-      self$connect()
-      res <- DBI::dbCreateTable(
-        conn = self$get("connection"),
-        name = DBI::Id(schema = schema, table = table),
-        fields = fields
+      self$generic(
+        fn = DBI::dbCreateTable,
+        params = list(
+          conn = self$get("connection"),
+          name = DBI::Id(schema = schema, table = table),
+          fields = fields
+        )
       )
-      self$disconnect()
-      return(res)
     },
 
-    #' append
-    #'
-    #' Appends the data in `df` to the table `name`.
     #'
     #' @param schema A schema name to reference. Default is "public".
     #' @param table A table name to append to.
     #' @param data A data.frame to append to the table.
     #'
-    #' @importFrom DBI Id dbWriteTable
-    #'
     append = function(schema = "public", table, data) {
-      self$connect()
-      res <- DBI::dbWriteTable(
-        conn = self$get("connection"),
-        name = DBI::Id(schema = schema, table = table),
-        value = data,
-        append = TRUE
+      self$generic(
+        fn = DBI::dbWriteTable,
+        params = list(
+          conn = self$get("connection"),
+          name = DBI::Id(schema = schema, table = table),
+          value = data,
+          append = TRUE
+        )
       )
-      self$disconnect()
-      return(res)
     },
 
-    #' write
-    #'
-    #' Writes data in `df` to a table `name`.
     #'
     #' @param schema A schema name to reference. Default is "public".
     #' @param table A table name to write to.
     #' @param data A data frame to write to table.
     #'
-    #' @importFrom DBI Id dbWriteTable
-    #'
     write = function(schema = "public", table, data) {
-      self$connect()
-      res <- DBI::dbWriteTable(
-        conn = self$get("connection"),
-        name = DBI::Id(schema = schema, table = table),
-        value = data,
-        overwrite = TRUE
+      self$generic(
+        fn = DBI::dbWriteTable,
+        params = list(
+          conn = self$get("connection"),
+          name = DBI::Id(schema = schema, table = table),
+          value = data,
+          overwrite = TRUE
+        )
       )
-      self$disconnect()
-      return(res)
     },
 
     #' lineclean
@@ -208,8 +204,6 @@ dbInterface <- R6::R6Class(
     #' @param x A string to remove various whitespace from.
     #'
     #' @returns A cleaned string.
-    #'
-    #' @importFrom stringi stri_replace_all
     #'
     lineclean = function(x) {
       return(
@@ -228,7 +222,7 @@ dbInterface <- R6::R6Class(
     #'
     #' @param file A SQL file on disk to parse into a single line string.
     #'
-    #' @return
+    #' @return A cleaned SQL query from file.
     #'
     onelineq = function(file) {
       return(
