@@ -80,7 +80,7 @@ dbInterface <- R6::R6Class(
     connect = function() {
       self$set(
         "connection",
-        DBI::dbConnect(
+        dbConnect(
           drv  = self$get("driver"),
           host = self$get("host"),
           port = self$get("port"),
@@ -96,7 +96,7 @@ dbInterface <- R6::R6Class(
     #' @return self
     #'
     disconnect = function() {
-      DBI::dbDisconnect(self$get("connection"))
+      dbDisconnect(self$get("connection"))
       invisible(self)
     },
 
@@ -120,7 +120,7 @@ dbInterface <- R6::R6Class(
     #'
     query = function(sql) {
       self$generic(
-        fn = DBI::dbGetQuery,
+        fn = dbGetQuery,
         list(
           conn = self$get("connection"),
           statement = self$onelineq(sql)
@@ -135,7 +135,7 @@ dbInterface <- R6::R6Class(
     #'
     execute = function(sql) {
       self$generic(
-        fn = DBI::dbExecute,
+        fn = dbExecute,
         params = list(
           conn = self$get("connection"),
           statement = self$onelineq(sql),
@@ -150,10 +150,10 @@ dbInterface <- R6::R6Class(
     #'
     create = function(schema = "public", table, fields) {
       self$generic(
-        fn = DBI::dbCreateTable,
+        fn = dbCreateTable,
         params = list(
           conn = self$get("connection"),
-          name = DBI::Id(schema = schema, table = table),
+          name = Id(schema = schema, table = table),
           fields = fields
         )
       )
@@ -166,10 +166,10 @@ dbInterface <- R6::R6Class(
     #'
     append = function(schema = "public", table, data) {
       self$generic(
-        fn = DBI::dbWriteTable,
+        fn = dbWriteTable,
         params = list(
           conn = self$get("connection"),
-          name = DBI::Id(schema = schema, table = table),
+          name = Id(schema = schema, table = table),
           value = data,
           append = TRUE
         )
@@ -183,10 +183,10 @@ dbInterface <- R6::R6Class(
     #'
     write = function(schema = "public", table, data) {
       self$generic(
-        fn = DBI::dbWriteTable,
+        fn = dbWriteTable,
         params = list(
           conn = self$get("connection"),
-          name = DBI::Id(schema = schema, table = table),
+          name = Id(schema = schema, table = table),
           value = data,
           overwrite = TRUE
         )
@@ -207,7 +207,7 @@ dbInterface <- R6::R6Class(
     #'
     lineclean = function(x) {
       return(
-        stringi::stri_replace_all(
+        stri_replace_all(
           str = x,
           regex = c("\t+", "^\\s+", "\\s+$", "[ ]+", "^[-]+.*$"),
           replacement = " ",

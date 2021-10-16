@@ -10,6 +10,7 @@
 #' @importFrom shinyMobile f7Row f7Col f7Button
 mod_button_row_ui <- function(id) {
   ns <- NS(id)
+
   tagList(
     f7Row(
       f7Col(
@@ -46,18 +47,10 @@ mod_button_row_server <- function(id) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
 
-    return(
-      list(
-        food = reactive(input$food),
-        play = reactive(input$play),
-        poop = reactive(input$poop)
-      )
+    list(
+      food = reactive(input$food),
+      play = reactive(input$play),
+      poop = reactive(input$poop)
     )
   })
 }
-
-## To be copied in the UI
-# mod_button_row_ui("button_row_ui_1")
-
-## To be copied in the server
-# mod_button_row_server("button_row_ui_1")

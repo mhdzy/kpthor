@@ -29,9 +29,3 @@ mod_settings_server <- function(id){
 
   })
 }
-
-## To be copied in the UI
-# mod_settings_ui("settings_ui_1")
-
-## To be copied in the server
-# mod_settings_server("settings_ui_1")

@@ -10,16 +10,14 @@
 #' @importFrom shinyMobile f7Page f7TabLayout f7Navbar f7Tabs f7Tab f7Icon f7DatePicker
 app_ui <- function(request) {
   tagList(
-    # Leave this function for adding external resources
+
     golem_add_external_resources(),
-    # Your application UI logic
+
     f7Page(
       title = "kpthor",
 
       f7TabLayout(
-        navbar = f7Navbar(
-          title = h2("Good Morning, Kashi.")
-        ),
+        navbar = f7Navbar(title = h2("Good Morning, Kashi.")),
 
         f7Tabs(
           id = "f7_tabs",
@@ -39,7 +37,6 @@ app_ui <- function(request) {
               closeByOutsideClick = TRUE
             ),
 
-            ## button row ----
             mod_button_row_ui("buttons"),
             mod_popup_box_ui("food_vars"),
             mod_popup_box_ui("play_vars"),
@@ -57,19 +54,10 @@ app_ui <- function(request) {
         dark = TRUE,
         filled = FALSE,
         color = "#007aff",
-        touch = list(
-          tapHold = TRUE,
-          tapHoldDelay = 750,
-          iosTouchRipple = FALSE
-        ),
+        touch = list(tapHold = TRUE, tapHoldDelay = 750, iosTouchRipple = FALSE),
+        navbar = list(iosCenterTitle = FALSE, hideNavOnPageScroll = TRUE),
+        toolbar = list(hideNavOnPageScroll = FALSE),
         iosTranslucentBars = TRUE,
-        navbar = list(
-          iosCenterTitle = FALSE,
-          hideNavOnPageScroll = TRUE
-        ),
-        toolbar = list(
-          hideNavOnPageScroll = FALSE
-        ),
         pullToRefresh = FALSE
       )
 
@@ -99,8 +87,7 @@ golem_add_external_resources <- function() {
       app_title = 'kpthor'
     ),
     useShinyjs()
-    # Add here other external resources
-    # for example, you can add shinyalert::useShinyalert()
+    # shinyalert::useShinyalert()
   )
 }
 
