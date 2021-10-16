@@ -11,7 +11,7 @@
 #' @importFrom shinyMobile f7Sheet f7Row f7Col f7Stepper f7Button
 mod_popup_box_ui <- function(id) {
   ns <- NS(id)
-  ## food sheet ----
+
   tagList(
     f7Sheet(
       id = ns("sheet"),
@@ -123,9 +123,3 @@ mod_popup_box_server <- function(id, sheet_trigger) {
 
   })
 }
-
-## To be copied in the UI
-# mod_popup_box_ui("popup_box_ui_1")
-
-## To be copied in the server
-# mod_popup_box_server("popup_box_ui_1")

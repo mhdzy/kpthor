@@ -10,10 +10,12 @@
 #' @importFrom shinyMobile f7Tab f7Icon
 mod_monitor_ui <- function(id) {
   ns <- NS(id)
+
   f7Tab(
     tabName = "monitor",
     icon = f7Icon("graph_square")
   )
+
 }
 
 #' monitor Server Functions
@@ -27,9 +29,3 @@ mod_monitor_server <- function(id) {
 
   })
 }
-
-## To be copied in the UI
-# mod_monitor_ui("monitor_ui_1")
-
-## To be copied in the server
-# mod_monitor_server("monitor_ui_1")
