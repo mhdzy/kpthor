@@ -17,6 +17,8 @@
 ## Add one line by package you want to add as dependency
 usethis::use_package( "DBI" )
 usethis::use_package( "DT" )
+usethis::use_package( "covr", type = "suggests" )
+usethis::use_package( "devtools", type = "suggests" )
 usethis::use_package( "dplyr" )
 usethis::use_package( "installr" )
 usethis::use_package( "logger" )
