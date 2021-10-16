@@ -13,14 +13,13 @@ knitr::opts_chunk$set(
 )
 ```
 
-# { kpthor } <img src="https://raw.githubusercontent.com/mhdzy/kpthor/main/inst/app/www/favicon.png" align="right" width="120"/>
+# { kpthor } <img src="inst/app/www/favicon.ico" align="right" width="120"/>
 
 <!-- badges: start -->
 [![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
-[![R-check](https://github.com/mhdzy/kpthor/workflows/R-check/badge.svg)](https://github.com/mhdzy/kpthor/actions)
+[![R-os](https://github.com/mhdzy/kpthor/workflows/R-os/badge.svg)](https://github.com/mhdzy/kpthor/actions)
 [![R-install](https://github.com/mhdzy/kpthor/workflows/R-install/badge.svg)](https://github.com/mhdzy/kpthor/actions)
-[![Codecov (main)](https://codecov.io/gh/mhdzy/kpthor/branch/main/graph/badge.svg)](https://codecov.io/gh/mhdzy/kpthor?branch=main)
-[![Codecov (dev)](https://codecov.io/gh/matthewhandzy/kp/branch/dev/graph/badge.svg)](https://codecov.io/gh/mhdzy/kpthor?branch=dev)
+[![codecov](https://codecov.io/gh/mhdzy/kpthor/branch/main/graph/badge.svg?token=6HK4PC05NR)](https://codecov.io/gh/mhdzy/kpthor)
 <!-- badges: end -->
 
 The goal of **kpthor** is to create an interactive site that lets you track your dog's
