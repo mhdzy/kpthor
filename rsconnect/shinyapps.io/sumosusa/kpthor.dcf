@@ -1,0 +1,13 @@
+name: kpthor
+title: kpthor
+username:
+account: sumosusa
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 4849009
+bundleId: 5128875
+url: https://sumosusa.shinyapps.io/kpthor/
+when: 1633999197.08329
+lastSyncTime: 1633999197.0833
+asMultiple: FALSE
+asStatic: FALSE

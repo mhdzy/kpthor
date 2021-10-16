@@ -1,14 +1,18 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# { kpthor } <img src="https://raw.githubusercontent.com/matthewhandzy/kpthor/main/inst/app/www/favicon.png" align="right" width="120"/>
+# { kpthor } <img src="https://raw.githubusercontent.com/mhdzy/kpthor/main/inst/app/www/favicon.png" align="right" width="120"/>
 
 <!-- badges: start -->
 
 [![Lifecycle:
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
-[![Codecov test
-coverage](https://codecov.io/gh/matthewhandzy/kp/branch/main/graph/badge.svg)](https://codecov.io/gh/matthewhandzy/kpthor?branch=main)
+[![R-check](https://github.com/mhdzy/kpthor/workflows/R-check/badge.svg)](https://github.com/mhdzy/kpthor/actions)
+[![R-install](https://github.com/mhdzy/kpthor/workflows/R-install/badge.svg)](https://github.com/mhdzy/kpthor/actions)
+[![Codecov
+(main)](https://codecov.io/gh/mhdzy/kpthor/branch/main/graph/badge.svg)](https://codecov.io/gh/mhdzy/kpthor?branch=main)
+[![Codecov
+(dev)](https://codecov.io/gh/matthewhandzy/kp/branch/dev/graph/badge.svg)](https://codecov.io/gh/mhdzy/kpthor?branch=dev)
 <!-- badges: end -->
 
 The goal of **kpthor** is to create an interactive site that lets you
