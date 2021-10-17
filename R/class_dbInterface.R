@@ -14,16 +14,22 @@ dbInterface <- R6::R6Class(
   classname = "dbInterface",
 
   private = list(
+    connection = NA,
     driver = NA,
     host = NA_character_,
     port = NA_integer_,
     user = NA_character_,
     pass = NA_character_,
     db   = NA_character_,
-    connection = NA
+
+    # optional fields for convenience
+    schema = NA_character_,
+    table = NA_character_
   ),
 
   public = list(
+
+    ## class methods ----
 
     #'
     #' @param drv A database connection driver.
@@ -32,16 +38,22 @@ dbInterface <- R6::R6Class(
     #' @param user A database username.
     #' @param pass A password to use to authenticate the user.
     #' @param db A database name to connect to.
+    #' @param schema An (optional) schema name. Required for `query_self()`.
+    #' @param table  An (optional) table name. Required for `query_self()`.
     #'
     #' @return self
     #'
-    initialize = function(drv, host, port, user, pass, db) {
+    initialize = function(drv, host, port, user, pass, db,
+                          schema = NA_character_, table = NA_character_) {
       self$set("driver", drv)
       self$set("host", host)
       self$set("port", port)
       self$set("user", user)
       self$set("pass", pass)
       self$set("db", db)
+
+      self$set("schema", schema)
+      self$set("table", table)
 
       tryCatch(
         expr = {
@@ -74,6 +86,8 @@ dbInterface <- R6::R6Class(
       invisible(self)
     },
 
+    ## connection ----
+
     #'
     #' @return self
     #'
@@ -100,6 +114,8 @@ dbInterface <- R6::R6Class(
       invisible(self)
     },
 
+    ## interaction ----
+
     #'
     #' @param fn A function to call.
     #' @param params A list of named parameters to pass to `fn`.
@@ -114,31 +130,84 @@ dbInterface <- R6::R6Class(
     },
 
     #'
-    #' @param sql A SQL query.
+    #' @param sql A SQL query string, or local file path to a SQL query.
     #'
     #' @return The results of the query.
     #'
     query = function(sql) {
+      if (file.exists(sql)) s = self$onelineq(sql) else s = self$lineclean(sql)
       self$generic(
         fn = dbGetQuery,
         list(
           conn = self$get("connection"),
-          statement = self$onelineq(sql)
+          statement = s
         )
       )
     },
 
     #'
-    #' @param sql
+    #' @description Class variables `schema` and `table` must be set (not NA).
+    #'
+    #' @return The results of a select * query from the class var `schema.table`.
+    #'
+    query_self = function() {
+      if (is.na(self$get("schema"))) stop("class schema must be defined")
+      if (is.na(self$get("table"))) stop("class table must be defined")
+
+      self$generic(
+        fn = dbGetQuery,
+        list(
+          conn = self$get("connection"),
+          statement = self$lineclean(
+            paste0("select * from ", self$get("schema"), ".", self$get("table"))
+          )
+        )
+      )
+    },
+
+    #'
+    #' @description A side-effect is the `schema` and `table` inputs are set
+    #' as class variables for future use.
+    #'
+    #' @param schema A schema name.
+    #' @param table A table name.
+    #'
+    #' @return The results of a select * query from the class var `schema.table`.
+    #'
+    query_self_param = function(schema, table) {
+      self$set("schema", schema)
+      self$set("table", table)
+      self$query_self()
+    },
+
+    #'
+    #' @description A wrapper for `query_param()` which resets the class
+    #' variables `schema` and `table` after querying.
+    #'
+    #' @param schema A schema name.
+    #' @param table A table name,
+    #'
+    #' @return The results of a select * query from the class var `schema.table`.
+    #'
+    query_self_param_clear = function(schema, table) {
+      res <- self$query_param(schema, table)
+      self$set("schema", NA_character_)
+      self$set("table", NA_character_)
+      return(res)
+    },
+
+    #'
+    #' @param sql A SQL query string, or local file path to a SQL query.
     #'
     #' @return The results of the execute.
     #'
     execute = function(sql) {
+      if (file.exists(sql)) s = self$onelineq(sql) else s = self$lineclean(sql)
       self$generic(
         fn = dbExecute,
         params = list(
           conn = self$get("connection"),
-          statement = self$onelineq(sql),
+          statement = s,
         )
       )
     },
@@ -193,6 +262,8 @@ dbInterface <- R6::R6Class(
       )
     },
 
+    ## class utils ----
+
     #' lineclean
     #'
     #' Cleans a string of whitespace, particularly of:
@@ -228,7 +299,7 @@ dbInterface <- R6::R6Class(
       return(
         paste(
           unlist(
-            Filter(function(x) x != "", lapply(readLines(file), lineclean))
+            Filter(function(x) x != "", lapply(readLines(file), self$lineclean))
           ),
           collapse = " "
         )

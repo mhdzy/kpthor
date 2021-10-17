@@ -41,9 +41,10 @@ golem::add_module( name = "monitor" )
 golem::add_module( name = "settings" )
 
 golem::add_module( name = "datetime_row" )
-
 golem::add_module( name = "button_row" )
 golem::add_module( name = "popup_box" )
+
+golem::add_module( name = "table" )
 
 ## Add helper functions ----
 ## Creates fct_* and utils_*
