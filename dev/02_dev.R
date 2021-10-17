@@ -22,29 +22,36 @@ usethis::use_package( "devtools", type = "suggests" )
 usethis::use_package( "dplyr" )
 usethis::use_package( "installr" )
 usethis::use_package( "logger" )
+usethis::use_package( "lubridate" )
 usethis::use_package( "magrittr" )
 usethis::use_package( "R6" )
 usethis::use_package( "RPostgres" )
 usethis::use_package( "shiny" )
 usethis::use_package( "shinyjs" )
 usethis::use_package( "shinyMobile" )
+usethis::use_package( "shinyTime" )
 usethis::use_package( "shinyWidgets" )
 usethis::use_package( "stringi" )
 usethis::use_package( "tibble" )
 
 ## Add modules ----
 ## Create a module infrastructure in R/
-golem::add_module( name = "inputs" ) # Name of the module
-golem::add_module( name = "monitor" ) # Name of the module
+golem::add_module( name = "inputs" )
+golem::add_module( name = "monitor" )
 golem::add_module( name = "settings" )
 
+golem::add_module( name = "datetime_row" )
 golem::add_module( name = "button_row" )
 golem::add_module( name = "popup_box" )
+
+golem::add_module( name = "table" )
 
 ## Add helper functions ----
 ## Creates fct_* and utils_*
 golem::add_fct( "db" )
+
 golem::add_utils( "vars" )
+golem::add_utils( "datetime" )
 
 ## External resources
 ## Creates .js and .css files at inst/app/www
