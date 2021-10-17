@@ -7,15 +7,12 @@
 #' @noRd
 #'
 #' @importFrom shiny NS tagList
-#' @importFrom shinyMobile f7Tab f7Icon
 mod_monitor_ui <- function(id) {
   ns <- NS(id)
 
-  f7Tab(
-    tabName = "monitor",
-    icon = f7Icon("graph_square")
-  )
+  tagList(
 
+  )
 }
 
 #' monitor Server Functions

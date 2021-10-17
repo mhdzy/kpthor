@@ -45,6 +45,8 @@ mod_datetime_row_ui <- function(id) {
 #' datetime_row Server Functions
 #'
 #' @noRd
+#'
+#' @importFrom shiny moduleServer reactive
 mod_datetime_row_server <- function(id) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns

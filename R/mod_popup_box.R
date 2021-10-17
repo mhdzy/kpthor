@@ -80,6 +80,7 @@ mod_popup_box_ui <- function(id) {
 #' @noRd
 #'
 #' @importFrom golem get_golem_options
+#' @importFrom logger log_trace log_debug
 #' @importFrom shiny moduleServer is.reactive observeEvent
 #' @importFrom shinyjs hide
 #' @importFrom shinyMobile updateF7Sheet
@@ -89,20 +90,25 @@ mod_popup_box_server <- function(id, sheet_trigger, datetime) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
 
+    ## sheet trigger ----
     observeEvent(
       eventExpr = sheet_trigger(),
       handlerExpr = {
         updateF7Sheet("sheet")
+        log_trace("[{id}] sheet triggered")
       }
     )
 
+    ## cancel btn ----
     observeEvent(
       eventExpr = input$cancel,
       handlerExpr = {
-        shinyjs::hide("sheet")
+        hide("sheet")
+        log_trace("[{id}] sheet hidden by cancel")
       }
     )
 
+    ## confirm btn ----
     observeEvent(
       eventExpr = input$confirm,
       handlerExpr = {
@@ -116,9 +122,13 @@ mod_popup_box_server <- function(id, sheet_trigger, datetime) {
           action = nams,
           value = vals
         )
-        print(df)
+
+        # update db
         dbi$append("kpthor", "events3", df)
-        logger::log_debug("appended ", nrow(df), " rows to kpthor.events")
+        log_debug("appended ", nrow(df), " rows to kpthor.events")
+
+        hide("sheet")
+        log_trace("[{id}] sheet hidden by confirm")
       }
     )
 

@@ -17,29 +17,43 @@ app_ui <- function(request) {
       title = "kpthor",
 
       f7TabLayout(
-        navbar = f7Navbar(title = h2(paste0("Good Morning, ", get_golem_options("pet")))),
+        navbar = f7Navbar(
+          title = h2(paste0("Good Morning, ", get_golem_options("pet"), "."))
+        ),
 
         f7Tabs(
           id = "f7_tabs",
 
+          ## inputs ----
           f7Tab(
             tabName = "inputs",
             icon = f7Icon("calendar_badge_plus"),
             active = TRUE,
 
-            mod_datetime_row_ui("datetime_row_ui_1"),
+            mod_datetime_row_ui("datetimes"),
 
             mod_button_row_ui("buttons"),
             mod_popup_box_ui("food_vars"),
             mod_popup_box_ui("play_vars"),
-            mod_popup_box_ui("poop_vars"),
-
-            mod_table_ui("table")
-
+            mod_popup_box_ui("poop_vars")
           ),
 
-          mod_monitor_ui("monitor"),
-          mod_settings_ui("settings")
+          ## monitor ----
+          f7Tab(
+            tabName = "monitor",
+            icon = f7Icon("graph_square"),
+
+            mod_monitor_ui("monitor"),
+            mod_table_ui("table")
+          ),
+
+          ## settings ----
+          f7Tab(
+            tabName = "settings",
+            icon = f7Icon("gear"),
+
+            mod_settings_ui("settings")
+          )
 
         )
       ),
@@ -53,7 +67,7 @@ app_ui <- function(request) {
         navbar = list(iosCenterTitle = FALSE, hideNavOnPageScroll = TRUE),
         toolbar = list(hideNavOnPageScroll = FALSE),
         iosTranslucentBars = TRUE,
-        pullToRefresh = FALSE
+        pullToRefresh = TRUE
       )
 
     )
