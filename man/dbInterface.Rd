@@ -236,7 +236,7 @@ variables `schema` and `table` after querying.
 \describe{
 \item{\code{schema}}{A schema name.}
 
-\item{\code{table}}{A table name,}
+\item{\code{table}}{A table name.}
 }
 \if{html}{\out{</div>}}
 }

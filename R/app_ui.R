@@ -17,7 +17,9 @@ app_ui <- function(request) {
       title = "kpthor",
 
       f7TabLayout(
-        navbar = f7Navbar(title = h2(paste0("Good Morning, ", get_golem_options("pet")))),
+        navbar = f7Navbar(
+          title = h2(paste0("Good Morning, ", get_golem_options("pet"), "."))
+        ),
 
         f7Tabs(
           id = "f7_tabs",
@@ -28,7 +30,7 @@ app_ui <- function(request) {
             icon = f7Icon("calendar_badge_plus"),
             active = TRUE,
 
-            mod_datetime_row_ui("datetime_row_ui_1"),
+            mod_datetime_row_ui("datetimes"),
 
             mod_button_row_ui("buttons"),
             mod_popup_box_ui("food_vars"),

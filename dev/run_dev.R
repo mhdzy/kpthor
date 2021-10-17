@@ -27,8 +27,7 @@ shinyMobile::preview_mobile(
 # kill the shiny system process
 unlist(lapply(paste("kill -9", test_pid), system))
 
-# reload dev libraries
+# reload dev libraries from pkg DESCRIPTION file
 libs_sub <- function(x) sub(" .*", "", trimws(stringi::stri_split(yaml::read_yaml("DESCRIPTION")[[x]], fixed = ",")[[1]]))
 libs_req_sug <- c(libs_sub("Imports"), libs_sub("Suggests"))
 invisible(suppressMessages(sapply(c(libs_req_sug), library, character.only = TRUE)))
-

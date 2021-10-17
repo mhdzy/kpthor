@@ -185,7 +185,7 @@ dbInterface <- R6::R6Class(
     #' variables `schema` and `table` after querying.
     #'
     #' @param schema A schema name.
-    #' @param table A table name,
+    #' @param table A table name.
     #'
     #' @return The results of a select * query from the class var `schema.table`.
     #'
