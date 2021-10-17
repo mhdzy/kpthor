@@ -83,7 +83,7 @@ mod_popup_box_ui <- function(id) {
 #' @importFrom shiny moduleServer is.reactive observeEvent
 #' @importFrom shinyjs hide
 #' @importFrom shinyMobile updateF7Sheet
-mod_popup_box_server <- function(id, sheet_trigger) {
+mod_popup_box_server <- function(id, sheet_trigger, datetime) {
   stopifnot(is.reactive(sheet_trigger))
 
   moduleServer(id, function(input, output, session) {
@@ -110,13 +110,14 @@ mod_popup_box_server <- function(id, sheet_trigger) {
         nams <- names(get_golem_options(id))
         vals <- unlist(lapply(nams, function(x) input[[x]]))
         df <- data.frame(
-          timestamp = Sys.time(),
+          date = datetime$date(),
+          time = datetime$time(),
           pet = get_golem_options("pet"),
           action = nams,
           value = vals
         )
         print(df)
-        dbi$append("kpthor", "events", df)
+        dbi$append("kpthor", "events3", df)
         logger::log_debug("appended ", nrow(df), " rows to kpthor.events")
       }
     )
