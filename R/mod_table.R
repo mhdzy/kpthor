@@ -32,7 +32,7 @@ mod_table_server <- function(id, datetime) {
     df_data <- reactive({
       logger::log_trace("df refresh")
       invalidateLater(5000)
-      dbi$query_param("kpthor", "events3")
+      dbi$query_self_param("kpthor", "events3")
     })
 
     output$table <- renderUI({

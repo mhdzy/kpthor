@@ -190,7 +190,7 @@ dbInterface <- R6::R6Class(
     #' @return The results of a select * query from the class var `schema.table`.
     #'
     query_self_param_clear = function(schema, table) {
-      res <- self$query_param(schema, table)
+      res <- self$query_self_param(schema, table)
       self$set("schema", NA_character_)
       self$set("table", NA_character_)
       return(res)
