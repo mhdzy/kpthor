@@ -30,7 +30,7 @@ app_ui <- function(request) {
             icon = f7Icon("calendar_badge_plus"),
             active = TRUE,
 
-            mod_datetime_row_ui("datetimes"),
+            mod_datetime_row_ui("time_vars"),
 
             mod_button_row_ui("buttons"),
             mod_popup_box_ui("food_vars"),

@@ -1,4 +1,4 @@
-#' vars
+#' uvars
 #'
 #' @description Wraps the inputs in a named list, intended to be used to
 #' specify a shinyMobile::f7Stepper input.
@@ -23,3 +23,4 @@ uvars <- function(min = 0L, max = 0L, step = 0L, value = 0L, color = "white") {
     )
   )
 }
+

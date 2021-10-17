@@ -5,6 +5,7 @@
 #' @inheritParams shiny::shinyApp
 #'
 #' @export
+#' @importFrom lubridate hour minute
 #' @importFrom shiny shinyApp
 #' @importFrom golem with_golem_options
 #' @importFrom RPostgres Postgres
@@ -33,6 +34,10 @@ run_app <- function(
         user = "pi",
         pass = "blueberry",
         db = "apps"
+      ),
+      time_vars = list(
+        hour = uvars(0L, 24L, 1L, hour, "gray"),
+        minute = uvars(0L, 60L, 1L, minute, "gray")
       ),
       food_vars = list(
         food = uvars(0, 5, 0.5, 2.5, "teal"),
