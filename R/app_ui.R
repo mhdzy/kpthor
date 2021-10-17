@@ -32,7 +32,10 @@ app_ui <- function(request) {
             mod_button_row_ui("buttons"),
             mod_popup_box_ui("food_vars"),
             mod_popup_box_ui("play_vars"),
-            mod_popup_box_ui("poop_vars")
+            mod_popup_box_ui("poop_vars"),
+
+            mod_table_ui("table")
+
           ),
 
           mod_monitor_ui("monitor"),
