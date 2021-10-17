@@ -6,9 +6,9 @@
 #'
 #' @noRd
 #'
-#' @importFrom lubridate hour
+#' @importFrom lubridate hour minute
 #' @importFrom shiny NS tagList
-#' @importFrom shinyMobile f7Row f7Col f7DatePicker f7Slider f7Icon
+#' @importFrom shinyMobile f7Row f7Col f7DatePicker f7Slider f7Icon f7Stepper
 mod_datetime_row_ui <- function(id) {
   ns <- NS(id)
 
@@ -25,16 +25,29 @@ mod_datetime_row_ui <- function(id) {
         )
       ),
       f7Col(
-        f7Slider(
-          inputId = ns("time"),
-          label = "time",
-          min = 0,
-          max = 24,
-          value = hour(Sys.time()),
-          scaleSteps = 24,
-          scaleSubSteps = 4,
-          labels = tagList(f7Icon("sunrise"), f7Icon("sunset-fill")),
-          color = "green"
+        align = "center",
+        lapply(
+          seq_along(get_golem_options(id)),
+          function(x) {
+            golem_opts <- get_golem_options(id)
+            tagList(
+              br(),
+              f7Stepper(
+                inputId = ns(paste0("time_", names(golem_opts)[x])),
+                label = paste0("time (", names(golem_opts)[x], ")"),
+                min = golem_opts[[x]]$min,
+                max = golem_opts[[x]]$max,
+                value = golem_opts[[x]]$value(Sys.time()),
+                color = golem_opts[[x]]$color,
+                #size = "small",
+                raised = TRUE,
+                wraps = TRUE,
+                manual = TRUE,
+                autorepeat = TRUE,
+                buttonsEndInputMode = TRUE
+              )
+            )
+          }
         )
       )
     )
@@ -54,7 +67,8 @@ mod_datetime_row_server <- function(id) {
     return(
       list(
         date = reactive(input$date),
-        time = reactive(input$time)
+        hour = reactive(input$time_hour),
+        minute = reactive(input$time_minute)
       )
     )
 

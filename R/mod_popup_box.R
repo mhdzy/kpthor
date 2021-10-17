@@ -25,26 +25,27 @@ mod_popup_box_ui <- function(id) {
         lapply(
           seq_along(get_golem_options(id)),
           function(x) {
+            golem_opts <- get_golem_options(id)
             tagList(
-              h4(names(get_golem_options(id))[x]),
+              h4(names(golem_opts)[x]),
               f7Row(
                 f7Col(
                   f7Stepper(
-                    inputId = ns(names(get_golem_options(id))[x]),
+                    inputId = ns(names(golem_opts)[x]),
                     label = NULL,
-                    min = get_golem_options(id)[[x]]$min,
-                    max = get_golem_options(id)[[x]]$max,
-                    step = get_golem_options(id)[[x]]$step,
-                    value = get_golem_options(id)[[x]]$value,
-                    color = get_golem_options(id)[[x]]$color
+                    min = golem_opts[[x]]$min,
+                    max = golem_opts[[x]]$max,
+                    step = golem_opts[[x]]$step,
+                    value = golem_opts[[x]]$value,
+                    color = golem_opts[[x]]$color
                   )
                 ),
                 f7Col(
                   f7Button(
-                    inputId = ns(paste(names(get_golem_options(id))[x], "submit", sep = "_")),
+                    inputId = ns(paste(names(golem_opts)[x], "submit", sep = "_")),
                     label = "submit",
                     size = "small",
-                    color = get_golem_options(id)[[x]]$color,
+                    color = golem_opts[[x]]$color,
                     fill = FALSE
                   )
                 )
@@ -117,7 +118,7 @@ mod_popup_box_server <- function(id, sheet_trigger, datetime) {
         vals <- unlist(lapply(nams, function(x) input[[x]]))
         df <- data.frame(
           date = datetime$date(),
-          time = datetime$time(),
+          time = datetime$hour(),
           pet = get_golem_options("pet"),
           action = nams,
           value = vals
