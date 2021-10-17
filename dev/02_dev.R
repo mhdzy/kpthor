@@ -17,10 +17,9 @@
 ## Add one line by package you want to add as dependency
 usethis::use_package( "DBI" )
 usethis::use_package( "DT" )
-usethis::use_package( "covr", type = "suggests" )
-usethis::use_package( "devtools", type = "suggests" )
+usethis::use_package( "covr" , type = "suggests" )
+usethis::use_package( "devtools" , type = "suggests" )
 usethis::use_package( "dplyr" )
-usethis::use_package( "installr" )
 usethis::use_package( "logger" )
 usethis::use_package( "lubridate" )
 usethis::use_package( "magrittr" )
@@ -29,10 +28,10 @@ usethis::use_package( "RPostgres" )
 usethis::use_package( "shiny" )
 usethis::use_package( "shinyjs" )
 usethis::use_package( "shinyMobile" )
-usethis::use_package( "shinyTime" )
 usethis::use_package( "shinyWidgets" )
 usethis::use_package( "stringi" )
 usethis::use_package( "tibble" )
+usethis::use_package( "tidyselect" )
 
 ## Add modules ----
 ## Create a module infrastructure in R/

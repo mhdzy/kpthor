@@ -20,38 +20,48 @@ mod_table_ui <- function(id) {
 #'
 #' @noRd
 #'
-#' @importFrom dplyr arrange filter desc
+#' @importFrom dplyr arrange desc filter select
 #' @importFrom golem get_golem_options
-#' @importFrom shiny invalidateLater renderUI
+#' @importFrom logger log_trace log_debug
+#' @importFrom magrittr %>%
+#' @importFrom shiny eventReactive invalidateLater renderUI
 #' @importFrom shinyMobile f7Table
-mod_table_server <- function(id, datetime) {
+#' @importFrom tidyselect everything
+mod_table_server <- function(id, refresh_trigger, datetime) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
-    dbi <- get_golem_options("dbi")
 
-    df_data <- reactive({
-      logger::log_trace("df refresh")
-      invalidateLater(5000)
+    df_data_rt <- reactive({
+      # force invalidation and update on df_data without hiding the result
+      # when input$ptr (refresh_trigger()) becomes NULL at end of animation
+      refresh_trigger()
+      1L
+    })
+
+    df_data <- eventReactive(df_data_rt(), {
+      log_trace("[{id}] df refresh")
+      # invalidateLater(5000)
+      dbi <- get_golem_options("dbi")
       dbi$query_self_param("kpthor", "events3")
     })
 
     output$table <- renderUI({
+      log_trace("[{id}] table render")
       f7Table(
-        arrange(
+        df_data() %>%
           filter(
-            df_data(),
-            date == datetime$date()
-          ),
-          desc(time)
-        )
+            date == datetime$date(),
+            pet == get_golem_options("pet")
+          ) %>%
+          select(
+            -c(pet),
+            everything()
+          ) %>%
+          arrange(
+            desc(time)
+          )
       )
     })
 
   })
 }
-
-## To be copied in the UI
-# mod_table_ui("table_ui_1")
-
-## To be copied in the server
-# mod_table_server("table_ui_1")
