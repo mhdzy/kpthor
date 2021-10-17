@@ -5,7 +5,10 @@
 #'
 #' @noRd
 #'
+#' @importFrom logger log_threshold log_layout layout_glue_colors TRACE
 app_server <- function( input, output, session ) {
+  log_threshold(TRACE)
+  log_layout(layout_glue_colors)
 
   datetime <- mod_datetime_row_server("datetime_row_ui_1")
   button_row <- mod_button_row_server("buttons")

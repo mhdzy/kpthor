@@ -80,6 +80,7 @@ mod_popup_box_ui <- function(id) {
 #' @noRd
 #'
 #' @importFrom golem get_golem_options
+#' @importFrom logger log_trace log_debug
 #' @importFrom shiny moduleServer is.reactive observeEvent
 #' @importFrom shinyjs hide
 #' @importFrom shinyMobile updateF7Sheet
@@ -93,6 +94,7 @@ mod_popup_box_server <- function(id, sheet_trigger, datetime) {
       eventExpr = sheet_trigger(),
       handlerExpr = {
         updateF7Sheet("sheet")
+        log_trace("[{id}] sheet triggered")
       }
     )
 
@@ -100,6 +102,7 @@ mod_popup_box_server <- function(id, sheet_trigger, datetime) {
       eventExpr = input$cancel,
       handlerExpr = {
         shinyjs::hide("sheet")
+        log_trace("[{id}] sheet hidden by cancel")
       }
     )
 
@@ -118,7 +121,9 @@ mod_popup_box_server <- function(id, sheet_trigger, datetime) {
         )
         print(df)
         dbi$append("kpthor", "events3", df)
-        logger::log_debug("appended ", nrow(df), " rows to kpthor.events")
+        log_debug("appended ", nrow(df), " rows to kpthor.events")
+
+        log_trace("[{id}] sheet hidden by confirm")
       }
     )
 
