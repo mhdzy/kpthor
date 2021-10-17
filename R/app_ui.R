@@ -17,7 +17,7 @@ app_ui <- function(request) {
       title = "kpthor",
 
       f7TabLayout(
-        navbar = f7Navbar(title = h2("Good Morning, Kashi.")),
+        navbar = f7Navbar(title = h2(paste0("Good Morning, ", get_golem_options("pet")))),
 
         f7Tabs(
           id = "f7_tabs",
@@ -27,15 +27,7 @@ app_ui <- function(request) {
             icon = f7Icon("calendar_badge_plus"),
             active = TRUE,
 
-            ## date picker ----
-            f7DatePicker(
-              inputId = "date",
-              label = "today's date",
-              value = Sys.Date(),
-              multiple = FALSE,
-              dateFormat = "mm/dd/yyyy",
-              closeByOutsideClick = TRUE
-            ),
+            mod_datetime_row_ui("datetime_row_ui_1"),
 
             mod_button_row_ui("buttons"),
             mod_popup_box_ui("food_vars"),
