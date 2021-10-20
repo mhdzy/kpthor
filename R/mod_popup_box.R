@@ -119,6 +119,7 @@ mod_popup_box_server <- function(id, sheet_trigger, datetime) {
         df <- data.frame(
           date = datetime$date(),
           time = datetime$hour(),
+          minute = datetime$minute(),
           pet = get_golem_options("pet"),
           action = nams,
           value = vals
