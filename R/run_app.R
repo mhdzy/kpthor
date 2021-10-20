@@ -29,7 +29,7 @@ run_app <- function(
       pet = "kashi",
       dbi = dbInterface$new(
         drv = RPostgres::Postgres(),
-        host = "192.168.0.111",
+        host = "192.168.0.101",
         port = 5432,
         user = "pi",
         pass = "blueberry",
@@ -44,8 +44,8 @@ run_app <- function(
         water = uvars(0, 5, 0.5, 1.0, "lightblue")
       ),
       play_vars = list(
-        play = uvars(0L, 60L, 5L, 30L, "deeppurple"),
-        walk = uvars(0L, 90L, 5L, 15L, "orange")
+        play = uvars(0L, 60L, 5L, 30L, "purple"),
+        walk = uvars(0L, 90L, 5L, 15L, "deeppurple")
       ),
       poop_vars = list(
         poop = uvars(0L, 3L, 1L, 1L, "deeporange"),

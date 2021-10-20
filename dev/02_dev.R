@@ -36,14 +36,18 @@ usethis::use_package( "tidyselect" )
 ## Add modules ----
 ## Create a module infrastructure in R/
 golem::add_module( name = "inputs" )
-golem::add_module( name = "monitor" )
-golem::add_module( name = "settings" )
+golem::add_module( name = "navbar" )
+
+golem::add_module( name = "button_action" )
+golem::add_module( name = "button_input" )
 
 golem::add_module( name = "datetime_row" )
-golem::add_module( name = "button_row" )
 golem::add_module( name = "popup_box" )
 
+golem::add_module( name = "monitor" )
 golem::add_module( name = "table" )
+
+golem::add_module( name = "settings" )
 
 ## Add helper functions ----
 ## Creates fct_* and utils_*
