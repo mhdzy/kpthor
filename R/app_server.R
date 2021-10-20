@@ -10,6 +10,8 @@ app_server <- function( input, output, session ) {
   log_threshold(TRACE)
   log_layout(layout_glue_colors)
 
+  mod_navbar_server("navbar")
+
   datetime <- mod_datetime_row_server("time_vars")
   button_row <- mod_button_row_server("buttons")
 

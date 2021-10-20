@@ -18,7 +18,7 @@ app_ui <- function(request) {
 
       f7TabLayout(
         navbar = f7Navbar(
-          title = h2(paste0("Good Morning, ", get_golem_options("pet"), "."))
+          title = mod_navbar_ui("navbar")
         ),
 
         f7Tabs(
