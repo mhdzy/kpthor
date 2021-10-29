@@ -34,7 +34,7 @@ mod_datetime_row_ui <- function(id) {
               br(),
               f7Stepper(
                 inputId = ns(paste0("time_", names(golem_opts)[x])),
-                label = paste0("• time (", names(golem_opts)[x], ") •"),
+                label = paste0("* time (", names(golem_opts)[x], ") *"),
                 min = golem_opts[[x]]$min,
                 max = golem_opts[[x]]$max,
                 value = golem_opts[[x]]$value(Sys.time()),
