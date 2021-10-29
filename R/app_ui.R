@@ -32,7 +32,7 @@ app_ui <- function(request) {
 
             # static button inputs
             mod_datetime_row_ui("time_vars"),
-            br(), mod_button_action_ui("actions"),
+            mod_button_action_ui("actions"),
             br(), mod_button_input_ui("inputs"),
 
             # popup inputs

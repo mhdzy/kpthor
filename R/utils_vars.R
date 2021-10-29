@@ -24,3 +24,13 @@ uvars <- function(min = 0L, max = 0L, step = 0L, value = 0L, color = "white") {
   )
 }
 
+#' uapply
+#'
+#' @description Returns an unlist(lapply(...)) for convenience.
+#'
+#' @param ... Inputs to lapply()
+#'
+#' @noRd
+uapply <- function(...) {
+  return(unlist(lapply(...)))
+}
