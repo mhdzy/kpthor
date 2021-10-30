@@ -23,7 +23,7 @@ mod_button_action_ui <- function(id) {
 #' @importFrom logger log_trace
 #' @importFrom lubridate seconds_to_period hour minute second
 #' @importFrom shiny moduleServer tagList observe observeEvent reactive
-#' @importFrom shiny reactiveVal reactiveValues req renderUI isolate
+#' @importFrom shiny reactiveVal reactiveValues req renderUI isolate div
 #' @importFrom shinyMobile f7Row f7Col f7Button updateF7Button f7Block f7BlockHeader
 #'
 mod_button_action_server <- function(id) {
@@ -68,20 +68,19 @@ mod_button_action_server <- function(id) {
     button_pressed <- reactiveVal(NA_character_)
     button_cache <- reactiveVal(rep(0, times = length(action_struct)))
     button_input <- reactive({
-      unlist(lapply(names(action_struct), function(x) input[[x]]))
+      uapply(names(action_struct), function(x) input[[x]])
     })
 
     output$timer <- renderUI({
       f7Row(
         lapply(names(action_struct), function(x) {
           f7Col(
-            if (identical(x, active_timer_mode())) {
-              f7Block(
-                HTML(paste0("<b>", x, " time: ", "</b>", active_timer_nice()))
-              )
-            } else {
-              f7Block()
-            }
+            style = "text-align: center; padding-bottom: 20px;",
+            HTML(ifelse(
+              identical(x, active_timer_mode()),
+              paste0("<b>", active_timer_nice(), "</b>"),
+              ""
+            ))
           )
         })
       )
