@@ -18,7 +18,7 @@ mod_datetime_row_ui <- function(id) {
         f7DatePicker(
           inputId = ns("date"),
           label = "date",
-          value = Sys.Date(),
+          value = as.POSIXlt(Sys.time()),
           multiple = FALSE,
           dateFormat = "mm/dd/yyyy",
           closeByOutsideClick = TRUE
