@@ -119,6 +119,7 @@ mod_popup_box_server <- function(id, sheet_trigger, datetime) {
         df <- data.frame(
           date = datetime$date(),
           time = datetime$hour(),
+          minute = datetime$minute(),
           pet = get_golem_options("pet"),
           action = nams,
           value = vals
@@ -126,7 +127,7 @@ mod_popup_box_server <- function(id, sheet_trigger, datetime) {
 
         # update db
         dbi$append("kpthor", "events3", df)
-        log_debug("appended ", nrow(df), " rows to kpthor.events")
+        log_debug("[{id}] appended ", nrow(df), " rows to kpthor.events")
 
         hide("sheet")
         log_trace("[{id}] sheet hidden by confirm")

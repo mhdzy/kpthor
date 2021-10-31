@@ -21,13 +21,16 @@ Sys.sleep(3)
 # run test in separate window
 shinyMobile::preview_mobile(
   appPath = system.file("app.R", package = "kpthor"),
-  device = "iphone8"
+  device = "iphone8+"
 )
 
 # kill the shiny system process
 unlist(lapply(paste("kill -9", test_pid), system))
 
 # reload dev libraries from pkg DESCRIPTION file
-libs_sub <- function(x) sub(" .*", "", trimws(stringi::stri_split(yaml::read_yaml("DESCRIPTION")[[x]], fixed = ",")[[1]]))
-libs_req_sug <- c(libs_sub("Imports"), libs_sub("Suggests"))
-invisible(suppressMessages(sapply(c(libs_req_sug), library, character.only = TRUE)))
+# this needs to be a function since the lib load code doesnt' always run itself
+dev <- function() {
+  libs_sub <- function(x) sub(" .*", "", trimws(stringi::stri_split(yaml::read_yaml("DESCRIPTION")[[x]], fixed = ",")[[1]]))
+  libs_req_sug <- c(libs_sub("Imports"), libs_sub("Suggests"))
+  invisible(suppressMessages(sapply(c(libs_req_sug), library, character.only = TRUE)))
+}

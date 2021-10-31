@@ -26,7 +26,6 @@ mod_table_ui <- function(id) {
 #' @importFrom magrittr %>%
 #' @importFrom shiny eventReactive invalidateLater renderUI
 #' @importFrom shinyMobile f7Table
-#' @importFrom tidyselect everything
 mod_table_server <- function(id, refresh_trigger, datetime) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
@@ -42,7 +41,7 @@ mod_table_server <- function(id, refresh_trigger, datetime) {
       log_trace("[{id}] df refresh")
       # invalidateLater(5000)
       dbi <- get_golem_options("dbi")
-      dbi$query_self_param("kpthor", "events3")
+      dbi$query_self_param("kpthor", "events")
     })
 
     output$table <- renderUI({
@@ -54,8 +53,7 @@ mod_table_server <- function(id, refresh_trigger, datetime) {
             pet == get_golem_options("pet")
           ) %>%
           select(
-            -c(pet),
-            everything()
+            -c(pet)
           ) %>%
           arrange(
             desc(time)

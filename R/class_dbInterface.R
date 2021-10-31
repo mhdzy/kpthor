@@ -10,6 +10,8 @@
 #' @importFrom DBI dbGetQuery dbExecute dbCreateTable dbWriteTable
 #' @importFrom R6 R6Class
 #' @importFrom stringi stri_replace_all
+#'
+#' @noRd
 dbInterface <- R6::R6Class(
   classname = "dbInterface",
 
@@ -31,6 +33,7 @@ dbInterface <- R6::R6Class(
 
     ## class methods ----
 
+    #' initialize
     #'
     #' @param drv A database connection driver.
     #' @param host A hostname to connect to.
@@ -60,12 +63,16 @@ dbInterface <- R6::R6Class(
           self$connect()
           self$disconnect()
         },
-        error = function(e) stop("could not initialize a db connection")
+        error = function(e) {
+          message(e)
+          stop("could not initialize a db connection")
+        }
       )
 
       invisible(self)
     },
 
+    #' get
     #'
     #' @param var A variable name to get.
     #'
@@ -75,6 +82,7 @@ dbInterface <- R6::R6Class(
       return(private[[var]])
     },
 
+    #' set
     #'
     #' @param var A variable name to set.
     #' @param val A variable value to set.
@@ -88,6 +96,7 @@ dbInterface <- R6::R6Class(
 
     ## connection ----
 
+    #' connect
     #'
     #' @return self
     #'
@@ -106,6 +115,7 @@ dbInterface <- R6::R6Class(
       invisible(self)
     },
 
+    #' disconnect
     #'
     #' @return self
     #'
@@ -116,6 +126,7 @@ dbInterface <- R6::R6Class(
 
     ## interaction ----
 
+    #' generic
     #'
     #' @param fn A function to call.
     #' @param params A list of named parameters to pass to `fn`.
@@ -129,6 +140,7 @@ dbInterface <- R6::R6Class(
       return(res)
     },
 
+    #' query
     #'
     #' @param sql A SQL query string, or local file path to a SQL query.
     #'
@@ -145,6 +157,7 @@ dbInterface <- R6::R6Class(
       )
     },
 
+    #' query_self
     #'
     #' @description Class variables `schema` and `table` must be set (not NA).
     #'
@@ -165,6 +178,7 @@ dbInterface <- R6::R6Class(
       )
     },
 
+    #' query_self_param
     #'
     #' @description A side-effect is the `schema` and `table` inputs are set
     #' as class variables for future use.
@@ -180,6 +194,7 @@ dbInterface <- R6::R6Class(
       self$query_self()
     },
 
+    #' query_self_param_clear
     #'
     #' @description A wrapper for `query_param()` which resets the class
     #' variables `schema` and `table` after querying.
@@ -196,6 +211,7 @@ dbInterface <- R6::R6Class(
       return(res)
     },
 
+    #' execute
     #'
     #' @param sql A SQL query string, or local file path to a SQL query.
     #'
@@ -212,6 +228,7 @@ dbInterface <- R6::R6Class(
       )
     },
 
+    #' create
     #'
     #' @param schema A schema name to create the table in. Defaults to "public".
     #' @param table A table name to create.
@@ -228,6 +245,7 @@ dbInterface <- R6::R6Class(
       )
     },
 
+    #' append
     #'
     #' @param schema A schema name to reference. Default is "public".
     #' @param table A table name to append to.
@@ -245,6 +263,7 @@ dbInterface <- R6::R6Class(
       )
     },
 
+    #' write
     #'
     #' @param schema A schema name to reference. Default is "public".
     #' @param table A table name to write to.
@@ -302,6 +321,33 @@ dbInterface <- R6::R6Class(
             Filter(function(x) x != "", lapply(readLines(file), self$lineclean))
           ),
           collapse = " "
+        )
+      )
+    },
+
+    ## init utils ----
+    #' create_if_not_exist
+    #'
+    #' Creates a table `kpthor.events` if it doesn't exist in the connected
+    #' database.
+    #'
+    #' @return A return status code from the dbExecute.
+    #'
+    #' @importFrom DBI dbExecute
+    create_if_not_exist = function() {
+      query <- "create table if not exists kpthor.events (
+        date date,
+        time int,
+        minute int,
+        pet text,
+        action text,
+        value text
+      );"
+      self$generic(
+        fn = dbExecute,
+        params = list(
+          conn = self$get("connection"),
+          statement = self$lineclean(query)
         )
       )
     }

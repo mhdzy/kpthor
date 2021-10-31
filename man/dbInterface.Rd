@@ -36,6 +36,7 @@ tables, appending and writing to tables,
 \item \href{#method-write}{\code{dbInterface$write()}}
 \item \href{#method-lineclean}{\code{dbInterface$lineclean()}}
 \item \href{#method-onelineq}{\code{dbInterface$onelineq()}}
+\item \href{#method-create_if_not_exist}{\code{dbInterface$create_if_not_exist()}}
 \item \href{#method-clone}{\code{dbInterface$clone()}}
 }
 }
@@ -79,6 +80,8 @@ tables, appending and writing to tables,
 }
 \subsection{Returns}{
 self
+
+get
 }
 }
 \if{html}{\out{<hr>}}
@@ -98,6 +101,8 @@ self
 }
 \subsection{Returns}{
 The private variable value.
+
+set
 }
 }
 \if{html}{\out{<hr>}}
@@ -119,6 +124,8 @@ The private variable value.
 }
 \subsection{Returns}{
 self
+
+connect
 }
 }
 \if{html}{\out{<hr>}}
@@ -131,6 +138,8 @@ self
 
 \subsection{Returns}{
 self
+
+disconnect
 }
 }
 \if{html}{\out{<hr>}}
@@ -143,6 +152,8 @@ self
 
 \subsection{Returns}{
 self
+
+generic
 }
 }
 \if{html}{\out{<hr>}}
@@ -164,6 +175,8 @@ self
 }
 \subsection{Returns}{
 A result of the called function.
+
+query
 }
 }
 \if{html}{\out{<hr>}}
@@ -183,6 +196,8 @@ A result of the called function.
 }
 \subsection{Returns}{
 The results of the query.
+
+query_self
 }
 }
 \if{html}{\out{<hr>}}
@@ -196,6 +211,8 @@ Class variables `schema` and `table` must be set (not NA).
 
 \subsection{Returns}{
 The results of a select * query from the class var `schema.table`.
+
+query_self_param
 }
 }
 \if{html}{\out{<hr>}}
@@ -219,6 +236,8 @@ as class variables for future use.
 }
 \subsection{Returns}{
 The results of a select * query from the class var `schema.table`.
+
+query_self_param_clear
 }
 }
 \if{html}{\out{<hr>}}
@@ -242,6 +261,8 @@ variables `schema` and `table` after querying.
 }
 \subsection{Returns}{
 The results of a select * query from the class var `schema.table`.
+
+execute
 }
 }
 \if{html}{\out{<hr>}}
@@ -261,6 +282,8 @@ The results of a select * query from the class var `schema.table`.
 }
 \subsection{Returns}{
 The results of the execute.
+
+create
 }
 }
 \if{html}{\out{<hr>}}
@@ -278,7 +301,9 @@ The results of the execute.
 
 \item{\code{table}}{A table name to create.}
 
-\item{\code{fields}}{A named vector: names are column names, values are types.}
+\item{\code{fields}}{A named vector: names are column names, values are types.
+
+append}
 }
 \if{html}{\out{</div>}}
 }
@@ -298,7 +323,9 @@ The results of the execute.
 
 \item{\code{table}}{A table name to append to.}
 
-\item{\code{data}}{A data.frame to append to the table.}
+\item{\code{data}}{A data.frame to append to the table.
+
+write}
 }
 \if{html}{\out{</div>}}
 }
@@ -364,6 +391,23 @@ Cleans a string of whitespace, particularly of:
 }
 \subsection{Returns}{
 A cleaned SQL query from file.
+
+create_if_not_exist
+
+Creates a table `kpthor.events` if it doesn't exist in the connected
+database.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-create_if_not_exist"></a>}}
+\if{latex}{\out{\hypertarget{method-create_if_not_exist}{}}}
+\subsection{Method \code{create_if_not_exist()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{dbInterface$create_if_not_exist()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+A return status code from the dbExecute.
 }
 }
 \if{html}{\out{<hr>}}
