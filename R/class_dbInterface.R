@@ -63,7 +63,10 @@ dbInterface <- R6::R6Class(
           self$connect()
           self$disconnect()
         },
-        error = function(e) stop("could not initialize a db connection")
+        error = function(e) {
+          message(e)
+          stop("could not initialize a db connection")
+        }
       )
 
       invisible(self)
@@ -343,8 +346,8 @@ dbInterface <- R6::R6Class(
       self$generic(
         fn = dbExecute,
         params = list(
-          conn = self$get("conn"),
-          statement = self$onelineq(query)
+          conn = self$get("connection"),
+          statement = self$lineclean(query)
         )
       )
     }
