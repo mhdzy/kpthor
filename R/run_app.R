@@ -29,7 +29,7 @@ run_app <- function(
       pet = "kashi",
       dbi = dbInterface$new(
         drv = RPostgres::Postgres(),
-        host = "192.168.0.101",
+        host = "192.168.0.111",
         port = 5432,
         user = "pi",
         pass = "blueberry",
