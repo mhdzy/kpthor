@@ -26,7 +26,7 @@ mod_button_action_ui <- function(id) {
 #' @importFrom shiny reactiveVal reactiveValues req renderUI isolate div
 #' @importFrom shinyMobile f7Row f7Col f7Button updateF7Button f7Block f7BlockHeader
 #'
-mod_button_action_server <- function(id) {
+mod_button_action_server <- function(id, datetime) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
 
@@ -146,11 +146,20 @@ mod_button_action_server <- function(id) {
         )
       } else if (identical(active_timer_mode(), button_pressed())) {
         print("identical")
-        # END ACTIVE TIMER      RECORD TIME       DO NOT START NEW TIMER
         mode <- isolate(active_timer_mode())
         time <- isolate(active_timer_time())
-        # TODO: record to db
         log_trace("[{id}] mode '{mode}' ran for '{time}' seconds")
+
+        df <- data.frame(
+          date = datetime$date(),
+          time = datetime$hour(),
+          minute = datetime$minute(),
+          pet = get_golem_options("pet"),
+          action = mode,
+          value = time
+        )
+        get_golem_options("dbi")$append("kpthor", "events", df)
+        log_debug("[{id}] appended ", nrow(df), " rows to kpthor.events")
 
         active_timer_stat(FALSE)
         active_timer_mode("")
@@ -162,11 +171,20 @@ mod_button_action_server <- function(id) {
         )
       } else {
         print("different")
-        # END ACTIVE TIMER      RECORD TIME       START NEW TIMER
         mode <- isolate(active_timer_mode())
         time <- isolate(active_timer_time())
-        # TODO: record to db
         log_trace("[{id}] mode '{mode}' ran for '{time}' seconds")
+
+        df <- data.frame(
+          date = datetime$date(),
+          time = datetime$hour(),
+          minute = datetime$minute(),
+          pet = get_golem_options("pet"),
+          action = mode,
+          value = time
+        )
+        get_golem_options("dbi")$append("kpthor", "events", df)
+        log_debug("[{id}] appended ", nrow(df), " rows to kpthor.events")
 
         active_timer_stat(FALSE)
         active_timer_mode("")

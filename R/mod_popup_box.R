@@ -113,7 +113,6 @@ mod_popup_box_server <- function(id, sheet_trigger, datetime) {
     observeEvent(
       eventExpr = input$confirm,
       handlerExpr = {
-        dbi <- get_golem_options("dbi")
         nams <- names(get_golem_options(id))
         vals <- unlist(lapply(nams, function(x) input[[x]]))
         df <- data.frame(
@@ -126,7 +125,7 @@ mod_popup_box_server <- function(id, sheet_trigger, datetime) {
         )
 
         # update db
-        dbi$append("kpthor", "events3", df)
+        get_golem_options("dbi")$append("kpthor", "events", df)
         log_debug("[{id}] appended ", nrow(df), " rows to kpthor.events")
 
         hide("sheet")
