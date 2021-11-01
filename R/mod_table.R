@@ -26,14 +26,17 @@ mod_table_ui <- function(id) {
 #' @importFrom magrittr %>%
 #' @importFrom shiny eventReactive invalidateLater renderUI
 #' @importFrom shinyMobile f7Table
-mod_table_server <- function(id, refresh_trigger, datetime) {
+mod_table_server <- function(id, refresh_pull, refresh_tabs, datetime) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
 
     df_data_rt <- reactive({
       # force invalidation and update on df_data without hiding the result
       # when input$ptr (refresh_trigger()) becomes NULL at end of animation
-      refresh_trigger()
+      #
+      # also toss in tab switch
+      refresh_pull()
+      refresh_tabs()
       1L
     })
 
