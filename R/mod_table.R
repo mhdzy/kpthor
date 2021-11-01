@@ -42,9 +42,7 @@ mod_table_server <- function(id, refresh_pull, refresh_tabs, datetime) {
 
     df_data <- eventReactive(df_data_rt(), {
       log_trace("[{id}] df refresh")
-      # invalidateLater(5000)
-      dbi <- get_golem_options("dbi")
-      dbi$query_self_param("kpthor", "events")
+      get_golem_options("dbi")$query_self_param("kpthor", "events")
     })
 
     output$table <- renderUI({
