@@ -57,7 +57,8 @@ mod_table_server <- function(id, refresh_pull, refresh_tabs, datetime) {
             -c(pet)
           ) %>%
           arrange(
-            desc(time)
+            desc(time),
+            desc(minute)
           )
       )
     })

@@ -30,6 +30,8 @@ mod_button_action_server <- function(id, datetime) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
 
+    # names are used to define button inputs
+    # items are lists of visual parameters; labels and colors
     action_struct = list(
       walk = list(
         name = "walk",
@@ -53,6 +55,7 @@ mod_button_action_server <- function(id, datetime) {
       )
     )
 
+    # active_timer_* are reactive values used to administer the timer mechanism
     active_timer_stat <- reactiveVal(FALSE)
     active_timer_mode <- reactiveVal("")
     active_timer_time <- reactiveVal(0)
@@ -65,6 +68,14 @@ mod_button_action_server <- function(id, datetime) {
       paste(uapply(seq_along(pt_time), function(x) paste(pt_time[x], names(pt_time)[x])), collapse = " ")
     })
 
+    observe({
+      invalidateLater(1000)
+      isolate({
+        if (active_timer_stat()) active_timer_time(active_timer_time() + 1)
+      })
+    })
+
+    # button_* are reactive values used to determine button press names
     button_pressed <- reactiveVal(NA_character_)
     button_cache <- reactiveVal(rep(0, times = length(action_struct)))
     button_input <- reactive({
@@ -100,8 +111,12 @@ mod_button_action_server <- function(id, datetime) {
       )
     })
 
+    # button_input
     #
-    # updates the button_pressed and button_cache reactives
+    # Determines (by name) which button was pressed. This is achieved by keeping
+    # a cache of the button press values to check against when a button press
+    # is detected. Once the name is found, updates the button_pressed and
+    # button_cache reactives.
     #
     observeEvent(button_input(), {
       req(button_input())
@@ -118,34 +133,37 @@ mod_button_action_server <- function(id, datetime) {
       }
     })
 
-    observe({
-      invalidateLater(1000)
-      isolate({
-        if (active_timer_stat()) {
-          active_timer_time(active_timer_time() + 1)
-          if (!(active_timer_stat() %% 60)) {
-            log_trace("[{id}] time: {active_timer_time()}")
-          }
-        }
-      })
-    })
-
+    # button_cache
+    #
+    #  Handles the mode/timer switching when action buttons are pressed. The
+    #  default (non-active) mode is "", but can be made one of 'out', 'walk',
+    #  or 'sleep'. Each of these is an identical abstract timer with identical
+    #  event handlers.
+    #
+    #  The relationship between each press can be one of: 'new', 'same', or
+    #  'swap'.
+    #   * If 'new', the button pressed becomes the active timer mode, and the
+    #     timer begins. There is nothing to record and thus is a simple event.
+    #   * If 'same', the button pressed is the same as the active timer mode,
+    #     thus the timer ends. The time elapsed is recorded to the db.
+    #   * If 'swap', then the timer mode is active, and the button pressed is
+    #     different from the active timer. The old timer ends, elapsed time
+    #     recorded, and the new timer mode begins.
+    #
     observeEvent(button_cache(), {
       req(button_pressed())
       log_trace("[{id}] button press detected: {button_pressed()}")
 
-      if (identical("", active_timer_mode())) {
-        print("new")
-        # NO ACTIVE TIMER       START NEW TIMER
-        active_timer_stat(TRUE)
-        active_timer_mode(button_pressed())
-        updateF7Button(
-          inputId = active_timer_mode(),
-          label = action_struct[[active_timer_mode()]][['end_activity']],
-          color = action_struct[[active_timer_mode()]][['active_color']]
-        )
-      } else if (identical(active_timer_mode(), button_pressed())) {
-        print("identical")
+      type <-
+        if (identical("", active_timer_mode())) {
+          "new"
+        } else if (identical(button_pressed(), active_timer_mode())) {
+          "same"
+        } else { # !identical(button_pressed(), active_timer_mode())
+          "swap"
+        }
+
+      if (type == "same" || type == "swap") {
         mode <- isolate(active_timer_mode())
         time <- isolate(active_timer_time())
         log_trace("[{id}] mode '{mode}' ran for '{time}' seconds")
@@ -169,32 +187,9 @@ mod_button_action_server <- function(id, datetime) {
           label = action_struct[[mode]][['start_activity']],
           color = action_struct[[mode]][['inactive_color']]
         )
-      } else {
-        print("different")
-        mode <- isolate(active_timer_mode())
-        time <- isolate(active_timer_time())
-        log_trace("[{id}] mode '{mode}' ran for '{time}' seconds")
+      }
 
-        df <- data.frame(
-          date = datetime$date(),
-          time = datetime$hour(),
-          minute = datetime$minute(),
-          pet = get_golem_options("pet"),
-          action = mode,
-          value = time
-        )
-        get_golem_options("dbi")$append("kpthor", "events", df)
-        log_debug("[{id}] appended ", nrow(df), " rows to kpthor.events")
-
-        active_timer_stat(FALSE)
-        active_timer_mode("")
-        active_timer_time(0)
-        updateF7Button(
-          inputId = mode,
-          label = action_struct[[mode]][['start_activity']],
-          color = action_struct[[mode]][['inactive_color']]
-        )
-
+      if (type == "new" || type == "swap") {
         active_timer_stat(TRUE)
         active_timer_mode(button_pressed())
         updateF7Button(
@@ -207,8 +202,8 @@ mod_button_action_server <- function(id, datetime) {
 
     return(
       list(
-        walk = reactive(input$walk),
-        out = reactive(input$out),
+        walk  = reactive(input$walk),
+        out   = reactive(input$out),
         sleep = reactive(input$sleep)
       )
     )
