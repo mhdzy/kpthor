@@ -51,7 +51,7 @@ run_app <- function(
         poop = c("poop", "poop", "deeporange")
       ),
       food_vars = list(
-        food = uvars(0, 5, 0.5, 2.5, "teal"),
+        food = uvars(0, 3, 0.5, 1.5, "teal"),
         water = uvars(0, 5, 0.5, 1.0, "lightblue")
       ),
       play_vars = list(
