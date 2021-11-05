@@ -37,8 +37,8 @@ run_app <- function(
         db = key_get("kpthor-app", "db-database"),
       ),
       time_vars = list(
-        hour = uvars(0L, 24L, 1L, hour, "gray"),
-        minute = uvars(0L, 60L, 1L, minute, "gray")
+        hour = uvars(0L, 24L, 1L, lubridate::hour, "gray"),
+        minute = uvars(0L, 60L, 1L, lubridate::minute, "gray")
       ),
       actions = list(
         walk = avars("walk", "start walk", "end walk"),
