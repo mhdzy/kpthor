@@ -40,6 +40,11 @@ run_app <- function(
         hour = uvars(0L, 24L, 1L, hour, "gray"),
         minute = uvars(0L, 60L, 1L, minute, "gray")
       ),
+      actions = list(
+        walk = avars("walk", "start walk", "end walk"),
+        out = avars("out", "go outside", "come inside"),
+        sleep = avars("sleep", "go to sleep", "wake up")
+      ),
       food_vars = list(
         food = uvars(0, 5, 0.5, 2.5, "teal"),
         water = uvars(0, 5, 0.5, 1.0, "lightblue")

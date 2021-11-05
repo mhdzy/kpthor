@@ -32,28 +32,7 @@ mod_button_action_server <- function(id, datetime) {
 
     # names are used to define button inputs
     # items are lists of visual parameters; labels and colors
-    action_struct = list(
-      walk = list(
-        name = "walk",
-        start_activity = "start walk",
-        end_activity = "end walk",
-        active_color = "red",
-        inactive_color = "blue"
-      ),
-      out = list(
-        name = "out",
-        start_activity = "go outside",
-        end_activity = "come inside",
-        active_color = "red",
-        inactive_color = "blue"),
-      sleep = list(
-        name = "sleep",
-        start_activity = "go to sleep",
-        end_activity = "wake up",
-        active_color = "red",
-        inactive_color = "blue"
-      )
-    )
+    action_struct <- get_golem_options(id)
 
     # active_timer_* are reactive values used to administer the timer mechanism
     active_timer_stat <- reactiveVal(FALSE)
@@ -68,6 +47,7 @@ mod_button_action_server <- function(id, datetime) {
       paste(uapply(seq_along(pt_time), function(x) paste(pt_time[x], names(pt_time)[x])), collapse = " ")
     })
 
+    ## o timer ----
     observe({
       invalidateLater(1000)
       isolate({
@@ -82,6 +62,7 @@ mod_button_action_server <- function(id, datetime) {
       uapply(names(action_struct), function(x) input[[x]])
     })
 
+    ## o$ timer ----
     output$timer <- renderUI({
       f7Row(
         lapply(names(action_struct), function(x) {
@@ -97,13 +78,14 @@ mod_button_action_server <- function(id, datetime) {
       )
     })
 
+    ## o$ row ----
     output$row <- renderUI({
       f7Row(
         lapply(action_struct, function(x) {
           f7Col(
             f7Button(
               inputId = ns(x[['name']]),
-              label = x[['start_activity']],
+              label = x[['start_label']],
               color = x[['inactive_color']]
             )
           )
@@ -111,6 +93,7 @@ mod_button_action_server <- function(id, datetime) {
       )
     })
 
+    ## oE button input ----
     # button_input
     #
     # Determines (by name) which button was pressed. This is achieved by keeping
@@ -133,6 +116,7 @@ mod_button_action_server <- function(id, datetime) {
       }
     })
 
+    ## oE button cache ----
     # button_cache
     #
     #  Handles the mode/timer switching when action buttons are pressed. The
@@ -184,8 +168,8 @@ mod_button_action_server <- function(id, datetime) {
         active_timer_time(0)
         updateF7Button(
           inputId = mode,
-          label = action_struct[[mode]][['start_activity']],
-          color = action_struct[[mode]][['inactive_color']]
+          label = action_struct[[mode]][['start_label']],
+          color = action_struct[[mode]][['start_color']]
         )
       }
 
@@ -194,8 +178,8 @@ mod_button_action_server <- function(id, datetime) {
         active_timer_mode(button_pressed())
         updateF7Button(
           inputId = active_timer_mode(),
-          label = action_struct[[active_timer_mode()]][['end_activity']],
-          color = action_struct[[active_timer_mode()]][['active_color']]
+          label = action_struct[[active_timer_mode()]][['end_label']],
+          color = action_struct[[active_timer_mode()]][['end_color']]
         )
       }
     })
