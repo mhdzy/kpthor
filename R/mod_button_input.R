@@ -26,12 +26,9 @@ mod_button_input_server <- function(id) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
 
-    row_struct <- list(
-      food = c("food", "food", "green"),
-      play = c("play", "play", "teal"),
-      poop = c("poop", "poop", "deeporange")
-    )
+    row_struct <- get_golem_options(id)
 
+    ## o$ row ----
     output$row <- renderUI({
       f7Row(
         lapply(row_struct, function(x) {
