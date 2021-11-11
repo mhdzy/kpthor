@@ -89,7 +89,7 @@ dbInterface <- R6::R6Class(
     #'
     connect = function() {
       self$set(
-        "connection",
+        "con",
         dbConnect(
           self$get("drv"),
           self$get("dsn")
@@ -103,7 +103,7 @@ dbInterface <- R6::R6Class(
     #' @return self
     #'
     disconnect = function() {
-      dbDisconnect(self$get("connection"))
+      dbDisconnect(self$get("con"))
       invisible(self)
     },
 
@@ -134,7 +134,7 @@ dbInterface <- R6::R6Class(
       self$generic(
         fn = dbGetQuery,
         list(
-          conn = self$get("connection"),
+          conn = self$get("con"),
           statement = s
         )
       )
@@ -153,7 +153,7 @@ dbInterface <- R6::R6Class(
       self$generic(
         fn = dbGetQuery,
         list(
-          conn = self$get("connection"),
+          conn = self$get("con"),
           statement = self$lineclean(
             paste0("select * from ", self$get("schema"), ".", self$get("table"))
           )
@@ -205,7 +205,7 @@ dbInterface <- R6::R6Class(
       self$generic(
         fn = dbExecute,
         params = list(
-          conn = self$get("connection"),
+          conn = self$get("con"),
           statement = s,
         )
       )
@@ -221,7 +221,7 @@ dbInterface <- R6::R6Class(
       self$generic(
         fn = dbCreateTable,
         params = list(
-          conn = self$get("connection"),
+          conn = self$get("con"),
           name = Id(schema = schema, table = table),
           fields = fields
         )
@@ -238,7 +238,7 @@ dbInterface <- R6::R6Class(
       self$generic(
         fn = dbWriteTable,
         params = list(
-          conn = self$get("connection"),
+          conn = self$get("con"),
           name = Id(schema = schema, table = table),
           value = data,
           append = TRUE
@@ -256,7 +256,7 @@ dbInterface <- R6::R6Class(
       self$generic(
         fn = dbWriteTable,
         params = list(
-          conn = self$get("connection"),
+          conn = self$get("con"),
           name = Id(schema = schema, table = table),
           value = data,
           overwrite = TRUE
@@ -329,11 +329,10 @@ dbInterface <- R6::R6Class(
       self$generic(
         fn = dbExecute,
         params = list(
-          conn = self$get("connection"),
+          conn = self$get("con"),
           statement = self$lineclean(query)
         )
       )
     }
-
   )
 )
