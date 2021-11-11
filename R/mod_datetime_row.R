@@ -18,7 +18,7 @@ mod_datetime_row_ui <- function(id) {
         f7DatePicker(
           inputId = ns("date"),
           label = "date",
-          value = lubridate::today(),
+          value = lubridate::today() + 1,
           multiple = FALSE,
           dateFormat = "mm/dd/yyyy",
           closeByOutsideClick = TRUE
@@ -66,7 +66,7 @@ mod_datetime_row_server <- function(id) {
 
     observeEvent(input$date, {
       log_trace("[{id}] psLT is: {isolate(as.POSIXlt(Sys.time()))}")
-      log_trace("[{id}] ltNY is: {as.Date(as.POSIXlt(Sys.time()), tz = \"America/New Yor\")}")
+      log_trace("[{id}] ltNY is: {as.Date(as.POSIXlt(Sys.time()), tz = \"America/New York\")}")
       log_trace("[{id}] date is: {isolate(input$date)}")
     })
 
