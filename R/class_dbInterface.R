@@ -16,13 +16,9 @@ dbInterface <- R6::R6Class(
   classname = "dbInterface",
 
   private = list(
-    connection = NA,
-    driver = NA,
-    host = NA_character_,
-    port = NA_integer_,
-    user = NA_character_,
-    pass = NA_character_,
-    db   = NA_character_,
+    con = NA,
+    drv = NA,
+    dsn = NA_character_,
 
     # optional fields for convenience
     schema = NA_character_,
@@ -35,25 +31,16 @@ dbInterface <- R6::R6Class(
 
     #' initialize
     #'
-    #' @param drv A database connection driver.
-    #' @param host A hostname to connect to.
-    #' @param port A port to connect to.
-    #' @param user A database username.
-    #' @param pass A password to use to authenticate the user.
-    #' @param db A database name to connect to.
+    #' @param drv A database driver, configured in `/etc/odbcinst.ini`.
+    #' @param dsn A data source name, configured in `/etc/odbc.ini`.
     #' @param schema An (optional) schema name. Required for `query_self()`.
     #' @param table  An (optional) table name. Required for `query_self()`.
     #'
     #' @return self
     #'
-    initialize = function(drv, host, port, user, pass, db,
-                          schema = NA_character_, table = NA_character_) {
-      self$set("driver", drv)
-      self$set("host", host)
-      self$set("port", port)
-      self$set("user", user)
-      self$set("pass", pass)
-      self$set("db", db)
+    initialize = function(drv, dsn, schema = NA_character_, table = NA_character_) {
+      self$set("drv", drv)
+      self$set("dsn", dsn)
 
       self$set("schema", schema)
       self$set("table", table)
@@ -104,12 +91,8 @@ dbInterface <- R6::R6Class(
       self$set(
         "connection",
         dbConnect(
-          drv  = self$get("driver"),
-          host = self$get("host"),
-          port = self$get("port"),
-          user = self$get("user"),
-          password = self$get("pass"),
-          dbname = self$get("db")
+          self$get("drv"),
+          self$get("dsn")
         )
       )
       invisible(self)

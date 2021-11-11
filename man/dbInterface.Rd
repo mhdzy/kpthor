@@ -45,16 +45,7 @@ tables, appending and writing to tables,
 \if{latex}{\out{\hypertarget{method-new}{}}}
 \subsection{Method \code{new()}}{
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{dbInterface$new(
-  drv,
-  host,
-  port,
-  user,
-  pass,
-  db,
-  schema = NA_character_,
-  table = NA_character_
-)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{dbInterface$new(drv, dsn, schema = NA_character_, table = NA_character_)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -62,15 +53,7 @@ tables, appending and writing to tables,
 \describe{
 \item{\code{drv}}{A database connection driver.}
 
-\item{\code{host}}{A hostname to connect to.}
-
-\item{\code{port}}{A port to connect to.}
-
-\item{\code{user}}{A database username.}
-
-\item{\code{pass}}{A password to use to authenticate the user.}
-
-\item{\code{db}}{A database name to connect to.}
+\item{\code{dsn}}{A data source name, configured in /etc/odbc.ini}
 
 \item{\code{schema}}{An (optional) schema name. Required for `query_self()`.}
 
