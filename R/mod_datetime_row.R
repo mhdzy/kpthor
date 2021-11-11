@@ -6,7 +6,7 @@
 #'
 #' @noRd
 #'
-#' @importFrom lubridate hour minute
+#' @importFrom lubridate hour minute today
 #' @importFrom shiny NS tagList
 #' @importFrom shinyMobile f7Row f7Col f7DatePicker f7Slider f7Icon f7Stepper
 mod_datetime_row_ui <- function(id) {
@@ -18,7 +18,7 @@ mod_datetime_row_ui <- function(id) {
         f7DatePicker(
           inputId = ns("date"),
           label = "date",
-          value = as.POSIXlt(Sys.time()),
+          value = lubridate::today(),
           multiple = FALSE,
           dateFormat = "mm/dd/yyyy",
           closeByOutsideClick = TRUE
@@ -63,6 +63,12 @@ mod_datetime_row_ui <- function(id) {
 mod_datetime_row_server <- function(id) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
+
+    observeEvent(input$date, {
+      log_trace("[{id}] psLT is: {isolate(as.POSIXlt(Sys.time()))}")
+      log_trace("[{id}] ltNY is: {as.Date(as.POSIXlt(Sys.time()), tz = \"America/New Yor\")}")
+      log_trace("[{id}] date is: {isolate(input$date)}")
+    })
 
     return(
       list(
