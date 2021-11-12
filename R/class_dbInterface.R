@@ -16,6 +16,10 @@ dbInterface <- R6::R6Class(
   classname = "dbInterface",
 
   private = list(
+    # drv is a database driver, configured in `/etc/odbcinst.ini`.
+    # dsn is a data source name, configured in `/etc/odbc.ini`.
+    # schema is an (optional) schema name. Required for `query_self()`.
+    # table is an (optional) table name. Required for `query_self()`.
     con = NA,
     drv = NA,
     dsn = NA_character_,
