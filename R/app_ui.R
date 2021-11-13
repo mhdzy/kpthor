@@ -17,34 +17,46 @@ app_ui <- function(request) {
       title = "kpthor",
 
       f7TabLayout(
-        navbar = f7Navbar(title = h2("Good Morning, Kashi.")),
+        navbar = f7Navbar(
+          title = mod_navbar_ui("navbar")
+        ),
 
         f7Tabs(
           id = "f7_tabs",
 
+          ## inputs ----
           f7Tab(
             tabName = "inputs",
             icon = f7Icon("calendar_badge_plus"),
             active = TRUE,
 
-            ## date picker ----
-            f7DatePicker(
-              inputId = "date",
-              label = "today's date",
-              value = Sys.Date(),
-              multiple = FALSE,
-              dateFormat = "mm/dd/yyyy",
-              closeByOutsideClick = TRUE
-            ),
+            # static button inputs
+            mod_datetime_row_ui("time_vars"),
+            mod_button_action_ui("actions"),
+            br(), mod_button_input_ui("inputs"),
 
-            mod_button_row_ui("buttons"),
+            # popup inputs
             mod_popup_box_ui("food_vars"),
             mod_popup_box_ui("play_vars"),
             mod_popup_box_ui("poop_vars")
           ),
 
-          mod_monitor_ui("monitor"),
-          mod_settings_ui("settings")
+          ## monitor ----
+          f7Tab(
+            tabName = "monitor",
+            icon = f7Icon("graph_square"),
+
+            mod_monitor_ui("monitor"),
+            mod_table_ui("table")
+          ),
+
+          ## settings ----
+          f7Tab(
+            tabName = "settings",
+            icon = f7Icon("gear"),
+
+            mod_settings_ui("settings")
+          )
 
         )
       ),
@@ -58,7 +70,7 @@ app_ui <- function(request) {
         navbar = list(iosCenterTitle = FALSE, hideNavOnPageScroll = TRUE),
         toolbar = list(hideNavOnPageScroll = FALSE),
         iosTranslucentBars = TRUE,
-        pullToRefresh = FALSE
+        pullToRefresh = TRUE
       )
 
     )

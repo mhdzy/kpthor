@@ -17,11 +17,12 @@
 ## Add one line by package you want to add as dependency
 usethis::use_package( "DBI" )
 usethis::use_package( "DT" )
-usethis::use_package( "covr", type = "suggests" )
-usethis::use_package( "devtools", type = "suggests" )
+usethis::use_package( "covr" , type = "suggests" )
+usethis::use_package( "devtools" , type = "suggests" )
 usethis::use_package( "dplyr" )
-usethis::use_package( "installr" )
+usethis::use_package( "keyring" )
 usethis::use_package( "logger" )
+usethis::use_package( "lubridate" )
 usethis::use_package( "magrittr" )
 usethis::use_package( "R6" )
 usethis::use_package( "RPostgres" )
@@ -31,26 +32,37 @@ usethis::use_package( "shinyMobile" )
 usethis::use_package( "shinyWidgets" )
 usethis::use_package( "stringi" )
 usethis::use_package( "tibble" )
+usethis::use_package( "tidyselect" )
 
 ## Add modules ----
 ## Create a module infrastructure in R/
-golem::add_module( name = "inputs" ) # Name of the module
-golem::add_module( name = "monitor" ) # Name of the module
-golem::add_module( name = "settings" )
+golem::add_module( name = "inputs" )
+golem::add_module( name = "navbar" )
 
-golem::add_module( name = "button_row" )
+golem::add_module( name = "button_action" )
+golem::add_module( name = "button_input" )
+
+golem::add_module( name = "datetime_row" )
 golem::add_module( name = "popup_box" )
+
+golem::add_module( name = "monitor" )
+golem::add_module( name = "table" )
+
+golem::add_module( name = "settings" )
 
 ## Add helper functions ----
 ## Creates fct_* and utils_*
 golem::add_fct( "db" )
+
 golem::add_utils( "vars" )
+golem::add_utils( "datetime" )
 
 ## External resources
 ## Creates .js and .css files at inst/app/www
 golem::add_js_file( "script" )
 golem::add_js_handler( "handlers" )
-golem::add_css_file( "custom" )
+
+golem::add_css_file( "popup" )
 
 ## Add internal datasets ----
 ## If you have data in your package
