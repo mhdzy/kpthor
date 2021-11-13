@@ -43,14 +43,14 @@ dbInterface <- R6::R6Class(
     #' @return self
     #'
     initialize = function(drv, dsn, schema = NA_character_, table = NA_character_) {
-      self$set("drv", drv)
-      self$set("dsn", dsn)
-
       self$set("schema", schema)
       self$set("table", table)
 
       tryCatch(
         expr = {
+          self$set("drv", drv)
+          self$set("dsn", dsn)
+
           self$connect()
           self$disconnect()
         },
@@ -58,11 +58,19 @@ dbInterface <- R6::R6Class(
           message(e)
           message("could not initialize a db connection; falling back to SQLite")
 
-          self$set("drv", RSQLite::SQLite())
-          self$set("dsn", ":memory:")
+          tryCatch(
+            expr = {
+              self$set("drv", RSQLite::SQLite())
+              self$set("dsn", ":memory:")
 
-          self$connect()
-          self$disconnect()
+              self$connect()
+              self$disconnect()
+            },
+            error = function(e) {
+              message(e)
+              message("could not initialize RSQLite, there will be no db access")
+            }
+          )
         }
       )
 
