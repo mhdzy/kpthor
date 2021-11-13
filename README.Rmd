@@ -36,7 +36,7 @@ The app uses a database to store pets, actions, and events. The db interface fun
 
 The `dbInterface` class accepts two required initialization parameters, `drv` and `dsn`. These correspond to a database driver and a data source name (DSN). Currently, the app connects to a DSN named `KPthorSQL` using an `ODBC` driver.
 
-Once the driver and DSN are configured, the database will need to then be loaded with tables that are required by the app. Functions to create these tables can be found in `R/class_dbInterface.R` with the `create_if_not_exist*()` naming pattern. 
+Once the driver and DSN are configured on your machine, the database will need to then be loaded with tables that are required by the app. Functions to create these tables can be found in `R/class_dbInterface.R` with the `create_if_not_exist*()` naming pattern. 
 
 todo: if no required tables are found, a local SQLite db is created to store info during each session
 
@@ -50,7 +50,7 @@ Description=KPthorSQL DSN
 User=my_database_username
 Password=my_database_password
 Database=apps
-Server=192.168.0.1
+Server=192.168.0.xxx
 Port=5432
 ```
 
