@@ -10,21 +10,21 @@ Imports:
     dplyr,
     DT,
     golem (>= 0.3.1),
-    keyring,
     logger,
     lubridate,
     magrittr,
+    odbc,
     pkgload,
     processx,
     R6,
     rlang,
-    RPostgres,
     shiny (>= 1.6.0),
     shinyjs,
     shinyMobile,
     stringi,
     tibble,
-    tidyselect
+    tidyselect,
+    utils
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.1.2

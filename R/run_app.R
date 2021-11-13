@@ -5,11 +5,10 @@
 #' @inheritParams shiny::shinyApp
 #'
 #' @export
-#' @importFrom keyring key_get
-#' @importFrom lubridate hour minute
-#' @importFrom shiny shinyApp
 #' @importFrom golem with_golem_options
-#' @importFrom RPostgres Postgres
+#' @importFrom lubridate hour minute
+#' @importFrom odbc odbc
+#' @importFrom shiny shinyApp
 run_app <- function(
   onStart = NULL,
   options = list(),
@@ -29,12 +28,10 @@ run_app <- function(
     golem_opts = list(
       pet = "kashi",
       dbi = dbInterface$new(
-        drv = RPostgres::Postgres(),
-        host = key_get("kpthor-app", "db-host"),
-        port = as.numeric(key_get("kpthor-app", "db-port")),
-        user = key_get("kpthor-app", "db-username"),
-        pass = key_get("kpthor-app", "db-password"),
-        db = key_get("kpthor-app", "db-database"),
+        # drv defined in /etc/odbcinst.ini
+        drv = odbc::odbc(),
+        # dsn defined in /etc/odbc.ini
+        dsn = "KPthorSQL"
       ),
       time_vars = list(
         hour = uvars(0L, 24L, 1L, lubridate::hour, "gray"),

@@ -33,6 +33,9 @@ tables, appending and writing to tables,
 \item \href{#method-execute}{\code{dbInterface$execute()}}
 \item \href{#method-create}{\code{dbInterface$create()}}
 \item \href{#method-append}{\code{dbInterface$append()}}
+\item \href{#method-append_self}{\code{dbInterface$append_self()}}
+\item \href{#method-append_self_param}{\code{dbInterface$append_self_param()}}
+\item \href{#method-append_self_param_clear}{\code{dbInterface$append_self_param_clear()}}
 \item \href{#method-write}{\code{dbInterface$write()}}
 \item \href{#method-lineclean}{\code{dbInterface$lineclean()}}
 \item \href{#method-onelineq}{\code{dbInterface$onelineq()}}
@@ -45,32 +48,15 @@ tables, appending and writing to tables,
 \if{latex}{\out{\hypertarget{method-new}{}}}
 \subsection{Method \code{new()}}{
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{dbInterface$new(
-  drv,
-  host,
-  port,
-  user,
-  pass,
-  db,
-  schema = NA_character_,
-  table = NA_character_
-)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{dbInterface$new(drv, dsn, schema = NA_character_, table = NA_character_)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{drv}}{A database connection driver.}
+\item{\code{drv}}{A database driver, configured in `/etc/odbcinst.ini`.}
 
-\item{\code{host}}{A hostname to connect to.}
-
-\item{\code{port}}{A port to connect to.}
-
-\item{\code{user}}{A database username.}
-
-\item{\code{pass}}{A password to use to authenticate the user.}
-
-\item{\code{db}}{A database name to connect to.}
+\item{\code{dsn}}{A data source name, configured in `/etc/odbc.ini`.}
 
 \item{\code{schema}}{An (optional) schema name. Required for `query_self()`.}
 
@@ -291,13 +277,13 @@ create
 \if{latex}{\out{\hypertarget{method-create}{}}}
 \subsection{Method \code{create()}}{
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{dbInterface$create(schema = "public", table, fields)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{dbInterface$create(schema, table, fields)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{schema}}{A schema name to create the table in. Defaults to "public".}
+\item{\code{schema}}{A schema name to create the table in.}
 
 \item{\code{table}}{A table name to create.}
 
@@ -313,17 +299,88 @@ append}
 \if{latex}{\out{\hypertarget{method-append}{}}}
 \subsection{Method \code{append()}}{
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{dbInterface$append(schema = "public", table, data)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{dbInterface$append(schema, table, data)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{schema}}{A schema name to reference. Default is "public".}
+\item{\code{schema}}{A schema name to reference.}
 
 \item{\code{table}}{A table name to append to.}
 
 \item{\code{data}}{A data.frame to append to the table.
+
+append_self}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-append_self"></a>}}
+\if{latex}{\out{\hypertarget{method-append_self}{}}}
+\subsection{Method \code{append_self()}}{
+Class variables `schema` and `table` must be set (not NA).
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{dbInterface$append_self(data)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{data}}{A data frame to append.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+The results of an append query from the class var `schema.table`.
+
+append_self_param
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-append_self_param"></a>}}
+\if{latex}{\out{\hypertarget{method-append_self_param}{}}}
+\subsection{Method \code{append_self_param()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{dbInterface$append_self_param(schema, table, data)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{schema}}{A schema name to reference.}
+
+\item{\code{table}}{A table name to write to.}
+
+\item{\code{data}}{A data frame to append.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+The result of an append query from `append_self()`.
+
+append_self_param_clear
+
+About as good as `append()`, but exists because `query_self_param()` does.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-append_self_param_clear"></a>}}
+\if{latex}{\out{\hypertarget{method-append_self_param_clear}{}}}
+\subsection{Method \code{append_self_param_clear()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{dbInterface$append_self_param_clear(schema, table, data)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{schema}}{A schema name to reference.}
+
+\item{\code{table}}{A table name to write to.}
+
+\item{\code{data}}{A data frame to append.
 
 write}
 }
@@ -335,13 +392,13 @@ write}
 \if{latex}{\out{\hypertarget{method-write}{}}}
 \subsection{Method \code{write()}}{
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{dbInterface$write(schema = "public", table, data)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{dbInterface$write(schema, table, data)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{schema}}{A schema name to reference. Default is "public".}
+\item{\code{schema}}{A schema name to reference.}
 
 \item{\code{table}}{A table name to write to.}
 

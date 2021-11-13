@@ -16,13 +16,13 @@ dbInterface <- R6::R6Class(
   classname = "dbInterface",
 
   private = list(
-    connection = NA,
-    driver = NA,
-    host = NA_character_,
-    port = NA_integer_,
-    user = NA_character_,
-    pass = NA_character_,
-    db   = NA_character_,
+    # drv is a database driver, configured in `/etc/odbcinst.ini`.
+    # dsn is a data source name, configured in `/etc/odbc.ini`.
+    # schema is an (optional) schema name. Required for `query_self()`.
+    # table is an (optional) table name. Required for `query_self()`.
+    con = NA,
+    drv = NA,
+    dsn = NA_character_,
 
     # optional fields for convenience
     schema = NA_character_,
@@ -35,25 +35,16 @@ dbInterface <- R6::R6Class(
 
     #' initialize
     #'
-    #' @param drv A database connection driver.
-    #' @param host A hostname to connect to.
-    #' @param port A port to connect to.
-    #' @param user A database username.
-    #' @param pass A password to use to authenticate the user.
-    #' @param db A database name to connect to.
+    #' @param drv A database driver, configured in `/etc/odbcinst.ini`.
+    #' @param dsn A data source name, configured in `/etc/odbc.ini`.
     #' @param schema An (optional) schema name. Required for `query_self()`.
     #' @param table  An (optional) table name. Required for `query_self()`.
     #'
     #' @return self
     #'
-    initialize = function(drv, host, port, user, pass, db,
-                          schema = NA_character_, table = NA_character_) {
-      self$set("driver", drv)
-      self$set("host", host)
-      self$set("port", port)
-      self$set("user", user)
-      self$set("pass", pass)
-      self$set("db", db)
+    initialize = function(drv, dsn, schema = NA_character_, table = NA_character_) {
+      self$set("drv", drv)
+      self$set("dsn", dsn)
 
       self$set("schema", schema)
       self$set("table", table)
@@ -102,14 +93,10 @@ dbInterface <- R6::R6Class(
     #'
     connect = function() {
       self$set(
-        "connection",
+        "con",
         dbConnect(
-          drv  = self$get("driver"),
-          host = self$get("host"),
-          port = self$get("port"),
-          user = self$get("user"),
-          password = self$get("pass"),
-          dbname = self$get("db")
+          self$get("drv"),
+          self$get("dsn")
         )
       )
       invisible(self)
@@ -120,7 +107,7 @@ dbInterface <- R6::R6Class(
     #' @return self
     #'
     disconnect = function() {
-      dbDisconnect(self$get("connection"))
+      dbDisconnect(self$get("con"))
       invisible(self)
     },
 
@@ -151,7 +138,7 @@ dbInterface <- R6::R6Class(
       self$generic(
         fn = dbGetQuery,
         list(
-          conn = self$get("connection"),
+          conn = self$get("con"),
           statement = s
         )
       )
@@ -167,14 +154,8 @@ dbInterface <- R6::R6Class(
       if (is.na(self$get("schema"))) stop("class schema must be defined")
       if (is.na(self$get("table"))) stop("class table must be defined")
 
-      self$generic(
-        fn = dbGetQuery,
-        list(
-          conn = self$get("connection"),
-          statement = self$lineclean(
-            paste0("select * from ", self$get("schema"), ".", self$get("table"))
-          )
-        )
+      self$query(
+        paste0("select * from ", self$get("schema"), ".", self$get("table"))
       )
     },
 
@@ -222,7 +203,7 @@ dbInterface <- R6::R6Class(
       self$generic(
         fn = dbExecute,
         params = list(
-          conn = self$get("connection"),
+          conn = self$get("con"),
           statement = s,
         )
       )
@@ -230,15 +211,15 @@ dbInterface <- R6::R6Class(
 
     #' create
     #'
-    #' @param schema A schema name to create the table in. Defaults to "public".
+    #' @param schema A schema name to create the table in.
     #' @param table A table name to create.
     #' @param fields A named vector: names are column names, values are types.
     #'
-    create = function(schema = "public", table, fields) {
+    create = function(schema, table, fields) {
       self$generic(
         fn = dbCreateTable,
         params = list(
-          conn = self$get("connection"),
+          conn = self$get("con"),
           name = Id(schema = schema, table = table),
           fields = fields
         )
@@ -247,15 +228,15 @@ dbInterface <- R6::R6Class(
 
     #' append
     #'
-    #' @param schema A schema name to reference. Default is "public".
+    #' @param schema A schema name to reference.
     #' @param table A table name to append to.
     #' @param data A data.frame to append to the table.
     #'
-    append = function(schema = "public", table, data) {
+    append = function(schema, table, data) {
       self$generic(
         fn = dbWriteTable,
         params = list(
-          conn = self$get("connection"),
+          conn = self$get("con"),
           name = Id(schema = schema, table = table),
           value = data,
           append = TRUE
@@ -263,17 +244,61 @@ dbInterface <- R6::R6Class(
       )
     },
 
+    #' append_self
+    #'
+    #' @description Class variables `schema` and `table` must be set (not NA).
+    #'
+    #' @param data A data frame to append.
+    #'
+    #' @return The results of an append query from the class var `schema.table`.
+    #'
+    append_self = function(data) {
+      if (is.na(self$get("schema"))) stop("class schema must be defined")
+      if (is.na(self$get("table"))) stop("class table must be defined")
+
+      self$append(self$get("schema"), self$get("table"), data)
+    },
+
+    #' append_self_param
+    #'
+    #' @param schema A schema name to reference.
+    #' @param table A table name to write to.
+    #' @param data A data frame to append.
+    #'
+    #' @return The result of an append query from `append_self()`.
+    #'
+    append_self_param = function(schema, table, data) {
+      self$set("schema", schema)
+      self$set("table", table)
+      self$append_self(data)
+    },
+
+    #' append_self_param_clear
+    #'
+    #' About as good as `append()`, but exists because `query_self_param()` does.
+    #'
+    #' @param schema A schema name to reference.
+    #' @param table A table name to write to.
+    #' @param data A data frame to append.
+    #'
+    append_self_param_clear = function(schema, table, data) {
+      res <- self$append_self_param(schema, table, data)
+      self$set("schema", NA_character_)
+      self$set("table", NA_character_)
+      return(res)
+    },
+
     #' write
     #'
-    #' @param schema A schema name to reference. Default is "public".
+    #' @param schema A schema name to reference.
     #' @param table A table name to write to.
     #' @param data A data frame to write to table.
     #'
-    write = function(schema = "public", table, data) {
+    write = function(schema, table, data) {
       self$generic(
         fn = dbWriteTable,
         params = list(
-          conn = self$get("connection"),
+          conn = self$get("con"),
           name = Id(schema = schema, table = table),
           value = data,
           overwrite = TRUE
@@ -346,11 +371,10 @@ dbInterface <- R6::R6Class(
       self$generic(
         fn = dbExecute,
         params = list(
-          conn = self$get("connection"),
+          conn = self$get("con"),
           statement = self$lineclean(query)
         )
       )
     }
-
   )
 )
