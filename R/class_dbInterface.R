@@ -154,14 +154,8 @@ dbInterface <- R6::R6Class(
       if (is.na(self$get("schema"))) stop("class schema must be defined")
       if (is.na(self$get("table"))) stop("class table must be defined")
 
-      self$generic(
-        fn = dbGetQuery,
-        list(
-          conn = self$get("con"),
-          statement = self$lineclean(
-            paste0("select * from ", self$get("schema"), ".", self$get("table"))
-          )
-        )
+      self$query(
+        paste0("select * from ", self$get("schema"), ".", self$get("table"))
       )
     },
 
