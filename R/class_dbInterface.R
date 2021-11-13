@@ -244,6 +244,50 @@ dbInterface <- R6::R6Class(
       )
     },
 
+    #' append_self
+    #'
+    #' @description Class variables `schema` and `table` must be set (not NA).
+    #'
+    #' @param data A data frame to append.
+    #'
+    #' @return The results of an append query from the class var `schema.table`.
+    #'
+    append_self = function(data) {
+      if (is.na(self$get("schema"))) stop("class schema must be defined")
+      if (is.na(self$get("table"))) stop("class table must be defined")
+
+      self$append(self$get("schema"), self$get("table"), data)
+    },
+
+    #' append_self_param
+    #'
+    #' @param schema A schema name to reference.
+    #' @param table A table name to write to.
+    #' @param data A data frame to append.
+    #'
+    #' @return The result of an append query from `append_self()`.
+    #'
+    append_self_param = function(schema, table, data) {
+      self$set("schema", schema)
+      self$set("table", table)
+      self$append_self(data)
+    },
+
+    #' append_self_param_clear
+    #'
+    #' About as good as `append()`, but exists because `query_self_param()` does.
+    #'
+    #' @param schema A schema name to reference.
+    #' @param table A table name to write to.
+    #' @param data A data frame to append.
+    #'
+    append_self_param_clear = function(schema, table, data) {
+      res <- self$append_self_param(schema, table, data)
+      self$set("schema", NA_character_)
+      self$set("table", NA_character_)
+      return(res)
+    },
+
     #' write
     #'
     #' @param schema A schema name to reference.
