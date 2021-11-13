@@ -56,7 +56,13 @@ dbInterface <- R6::R6Class(
         },
         error = function(e) {
           message(e)
-          stop("could not initialize a db connection")
+          message("could not initialize a db connection; falling back to SQLite")
+
+          self$set("drv", RSQLite::SQLite())
+          self$set("dsn", ":memory:")
+
+          self$connect()
+          self$disconnect()
         }
       )
 
