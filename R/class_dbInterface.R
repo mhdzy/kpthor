@@ -211,11 +211,11 @@ dbInterface <- R6::R6Class(
 
     #' create
     #'
-    #' @param schema A schema name to create the table in. Defaults to "public".
+    #' @param schema A schema name to create the table in.
     #' @param table A table name to create.
     #' @param fields A named vector: names are column names, values are types.
     #'
-    create = function(schema = "public", table, fields) {
+    create = function(schema, table, fields) {
       self$generic(
         fn = dbCreateTable,
         params = list(
@@ -228,11 +228,11 @@ dbInterface <- R6::R6Class(
 
     #' append
     #'
-    #' @param schema A schema name to reference. Default is "public".
+    #' @param schema A schema name to reference.
     #' @param table A table name to append to.
     #' @param data A data.frame to append to the table.
     #'
-    append = function(schema = "public", table, data) {
+    append = function(schema, table, data) {
       self$generic(
         fn = dbWriteTable,
         params = list(
@@ -246,11 +246,11 @@ dbInterface <- R6::R6Class(
 
     #' write
     #'
-    #' @param schema A schema name to reference. Default is "public".
+    #' @param schema A schema name to reference.
     #' @param table A table name to write to.
     #' @param data A data frame to write to table.
     #'
-    write = function(schema = "public", table, data) {
+    write = function(schema, table, data) {
       self$generic(
         fn = dbWriteTable,
         params = list(
