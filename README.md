@@ -23,6 +23,20 @@ experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](h
 This app requires `R (>= 4.0)`, available for download at
 <https://cloud.r-project.org/>.
 
+### pkgs
+
+To run the app, a few R package dependencies are needed. These are
+documented in the `DESCRIPTION` file, but the code below will also
+install all packages (and their dependencies) imported (and suggested)
+by the app.
+
+``` r
+deps_to_scan <- c("Imports", "Suggests")
+uapply <- function(...) unlist(lapply(...))
+libs_sub <- function(x) sub(" .*", "", trimws(stringi::stri_split(yaml::read_yaml("DESCRIPTION")[[x]], fixed = ",")[[1]]))
+install.packages(uapply(deps_to_scan, libs_sub), dependencies = TRUE)
+```
+
 ## DBMS
 
 The app uses a database to store pets, actions, and events. The db
