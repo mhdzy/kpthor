@@ -17,6 +17,7 @@ Imports:
     pkgload,
     processx,
     R6,
+    renv,
     rlang,
     shiny (>= 1.6.0),
     shinyjs,

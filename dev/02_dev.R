@@ -25,6 +25,7 @@ usethis::use_package( "logger" )
 usethis::use_package( "lubridate" )
 usethis::use_package( "magrittr" )
 usethis::use_package( "R6" )
+usethis::use_package( "renv" )
 usethis::use_package( "RPostgres" )
 usethis::use_package( "shiny" )
 usethis::use_package( "shinyjs" )
@@ -33,6 +34,9 @@ usethis::use_package( "shinyWidgets" )
 usethis::use_package( "stringi" )
 usethis::use_package( "tibble" )
 usethis::use_package( "tidyselect" )
+
+## Dependency Management ----
+renv::snapshot(type = "explicit")
 
 ## Add modules ----
 ## Create a module infrastructure in R/
