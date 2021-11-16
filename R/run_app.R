@@ -6,6 +6,7 @@
 #'
 #' @export
 #' @importFrom golem with_golem_options
+#' @importFrom liteq ensure_queue
 #' @importFrom lubridate hour minute
 #' @importFrom odbc odbc
 #' @importFrom shiny shinyApp
@@ -33,6 +34,7 @@ run_app <- function(
         # dsn defined in /etc/odbc.ini
         dsn = "KPthorSQL"
       ),
+      timerq = ensure_queue("timerq", db = "db/timerq"),
       time_vars = list(
         hour = uvars(0L, 24L, 1L, lubridate::hour, "gray"),
         minute = uvars(0L, 60L, 1L, lubridate::minute, "gray")
