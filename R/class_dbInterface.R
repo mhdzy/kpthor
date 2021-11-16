@@ -6,6 +6,7 @@
 #'
 #' @return The return value, if any, from executing the function.
 #'
+#' @importFrom logger log_trace
 #' @importFrom DBI Id dbConnect dbDisconnect
 #' @importFrom DBI dbGetQuery dbExecute dbCreateTable dbWriteTable
 #' @importFrom R6 R6Class
@@ -99,6 +100,7 @@ dbInterface <- R6::R6Class(
           self$get("dsn")
         )
       )
+      log_trace("[dbi] connected to DSN '{self$get('dsn')}'")
       invisible(self)
     },
 
@@ -108,6 +110,7 @@ dbInterface <- R6::R6Class(
     #'
     disconnect = function() {
       dbDisconnect(self$get("con"))
+      log_trace("[dbi] disconnected from DSN '{self$get('dsn')}'")
       invisible(self)
     },
 

@@ -27,5 +27,4 @@ app_server <- function( input, output, session ) {
 
   mod_monitor_server("monitor")
   mod_settings_server("settings")
-
 }
