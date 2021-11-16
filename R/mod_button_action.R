@@ -53,18 +53,18 @@ mod_button_action_server <- function(id, datetime) {
       isolate({
         timerq <- get_golem_options("timerq")
         if (!is_empty(timerq)) {
-          # fetch message from queue to parse
+          # fetch message from queue to parse and immediately republish fetched message to the queue
           msg <- try_consume(timerq)
-          # remove "working" message from queue for safe unlock
-          ack(msg)
-          # immediately republish fetched message to the queue
           publish(timerq, title = msg$title, message = msg$message)
+
+          # acknowledge "working" message from queue for safe removal of object
+          ack(msg)
 
           # updates our timer if someone else activated a timer earlier
           active_timer_mode(msg$title)
 
           # set timer time as diff from start and curr
-          active_timer_time(round(seconds(Sys.time() - as.POSIXlt(msg$message)) * 60, 0L))
+          active_timer_time(round(as.numeric(Sys.time() - as.POSIXlt(msg$message), units = "secs"), 0L))
         }
       })
     })
