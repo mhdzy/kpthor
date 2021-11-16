@@ -204,7 +204,7 @@ dbInterface <- R6::R6Class(
         fn = dbExecute,
         params = list(
           conn = self$get("con"),
-          statement = s,
+          statement = s
         )
       )
     },
