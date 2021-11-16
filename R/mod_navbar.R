@@ -30,7 +30,9 @@ mod_navbar_server <- function(id) {
     output$message <- renderUI({
       local <- hour(Sys.time())
       greeting <-
-        if (0 <= local && local < 12) {
+        if (identical("development", Sys.getenv("GOLEM_CONFIG_ACTIVE"))) {
+          "dev mode"
+        } else if (0 <= local && local < 12) {
           "morning"
         } else if (12 <= local && local < 18) {
           "afternoon"
