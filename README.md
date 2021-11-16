@@ -42,7 +42,8 @@ install.packages(uapply(deps_to_scan, libs_sub), dependencies = TRUE)
 The app uses a database to store pets, actions, and events. The db
 interface functions are defined in `R/class_dbInterface.R`, and
 connection parameters are configured by the `golem_opts$dbi` field (see
-`R/run_app.R`).
+`R/run_app.R`). The DSN name is taken from the `inst/golem-config.yml`
+file, depending on which mode is set in `.Renviron`.
 
 The `dbInterface` class accepts two required initialization parameters,
 `drv` and `dsn`. These correspond to a database driver and a data source
@@ -57,9 +58,19 @@ with the `create_if_not_exist*()` naming pattern.
 todo: if no required tables are found, a local SQLite db is created to
 store info during each session
 
+### system libraries
+
+The following libraries are required for ODBC integration.
+
+``` sh
+sudo apt install -y unixodbc-dev odbcinst odbc-postgresql
+```
+
 ### KPthorSQL
 
-Add the following entry to `/etc/odbc.ini`:
+The DSN name used for production is `KPthorSQL`, but supports a `dev`
+mode which uses the `KPthorSQL-dev` DSN name. Add the following entry to
+`/etc/odbc.ini`, and fill in your specific connection details:
 
 ``` ini
 [KPthorSQL]
@@ -74,7 +85,7 @@ Port=5432
 
 ### ODBC
 
-Add the following entry to `/etc/odbcinst.ini`:
+The ODBC driver used Add the following entry to `/etc/odbcinst.ini`:
 
 ``` ini
 [PostgreSQL Default]

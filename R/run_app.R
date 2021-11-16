@@ -32,7 +32,7 @@ run_app <- function(
         # drv defined in /etc/odbcinst.ini
         drv = odbc::odbc(),
         # dsn defined in /etc/odbc.ini
-        dsn = "KPthorSQL"
+        dsn = get_golem_config("app_dsn")
       ),
       timerq = ensure_queue("timerq", db = "db/timerq"),
       time_vars = list(
