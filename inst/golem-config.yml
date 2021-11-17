@@ -3,9 +3,11 @@ default: &defaults
   golem_version: 0.0.0.9000
   app_prod: no
   app_dsn: "KPthorSQL"
-development:
+dev: &dev
   <<: *defaults
   golem_wd: !expr here::here()
+development:
+  <<: *dev
   app_dsn: "KPthorSQL-dev"
 production:
   <<: *defaults
