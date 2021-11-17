@@ -16,6 +16,8 @@ app_ui <- function(request) {
 
     f7Page(
       title = "kpthor",
+      preloader = TRUE,
+      loading_duration = 3,
 
       f7TabLayout(
         navbar = f7Navbar(
@@ -24,6 +26,9 @@ app_ui <- function(request) {
 
         f7Tabs(
           id = "f7_tabs",
+          animated = FALSE,
+          swipeable = TRUE,
+          style = "toolbar",
 
           ## inputs ----
           f7Tab(
