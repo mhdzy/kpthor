@@ -43,7 +43,7 @@ mod_navbar_server <- function(id) {
         } else {
           "<sys err>"
         }
-     log_trace("[{id}] time-of-day greeting found: '{local}', '{greeting}'")
+      log_trace("[{id}] time-of-day greeting found: '{local}', '{greeting}'")
 
       h2(paste0("good ", greeting, ", ", get_golem_options("pet"), "."))
     })

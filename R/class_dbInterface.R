@@ -13,6 +13,9 @@
 #' @importFrom stringi stri_replace_all
 #'
 #' @noRd
+#'
+#' @seealso prevents noRd error
+#'
 dbInterface <- R6::R6Class(
   classname = "dbInterface",
 

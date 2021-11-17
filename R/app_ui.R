@@ -7,7 +7,8 @@
 #'
 #' @importFrom golem get_golem_options
 #' @importFrom shiny tagList h2
-#' @importFrom shinyMobile f7Page f7TabLayout f7Navbar f7Tabs f7Tab f7Icon f7DatePicker
+#' @importFrom shinyMobile f7Page f7Navbar f7TabLayout f7Tabs f7Tab
+#' @importFrom shinyMobile f7Icon f7DatePicker
 app_ui <- function(request) {
   tagList(
 
@@ -61,11 +62,12 @@ app_ui <- function(request) {
         )
       ),
 
+      ## options ----
       options = list(
         theme = c("ios"),
         dark = TRUE,
         filled = FALSE,
-        color = "#007aff",
+        color = "#a07aff",
         touch = list(tapHold = TRUE, tapHoldDelay = 750, iosTouchRipple = FALSE),
         navbar = list(iosCenterTitle = FALSE, hideNavOnPageScroll = TRUE),
         toolbar = list(hideNavOnPageScroll = FALSE),
