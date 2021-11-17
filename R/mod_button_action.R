@@ -39,7 +39,7 @@ mod_button_action_server <- function(id, datetime) {
     active_timer_mode <- reactiveVal("")
     active_timer_time <- reactiveVal(0)
     active_timer_nice <- reactive({
-      req(active_timer_mode())
+      if (!nchar(active_timer_mode())) return("")
       pd <- seconds_to_period(active_timer_time())
       pt_time <- c(hr = hour(pd), min = minute(pd), sec = second(pd))
       pt_time <- pt_time[pt_time != 0]
@@ -60,11 +60,39 @@ mod_button_action_server <- function(id, datetime) {
           # acknowledge "working" message from queue for safe removal of object
           ack(msg)
 
-          # updates our timer if someone else activated a timer earlier
-          active_timer_mode(msg$title)
+          # if msg contains a timer we aren't tracking, update our mode
+          if (active_timer_mode() != msg$title) active_timer_mode(msg$title)
 
           # set timer time as diff from start and curr
           active_timer_time(round(as.numeric(Sys.time() - as.POSIXlt(msg$message), units = "secs"), 0L))
+
+          # TODO: make this not brute-forced
+          # sets active timer button to red
+          updateF7Button(
+            inputId = action_struct[[active_timer_mode()]][['name']],
+            label = action_struct[[active_timer_mode()]][['end_label']],
+            color = action_struct[[active_timer_mode()]][['end_color']]
+          )
+          # TODO: make this not brute-forced
+          # clears out non-active timer rows to blue
+          lapply(names(action_struct)[!(names(action_struct) %in% active_timer_mode())], function(x) {
+            updateF7Button(
+              inputId = action_struct[[x]][['name']],
+              label = action_struct[[x]][['start_label']],
+              color = action_struct[[x]][['start_color']]
+            )
+          })
+        } else {
+          # clear everybody out
+          active_timer_mode("")
+          active_timer_time(0)
+          lapply(names(action_struct), function(x) {
+            updateF7Button(
+              inputId = action_struct[[x]][['name']],
+              label = action_struct[[x]][['start_label']],
+              color = action_struct[[x]][['start_color']]
+            )
+          })
         }
       })
     })
