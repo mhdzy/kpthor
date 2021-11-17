@@ -37,6 +37,27 @@ libs_sub <- function(x) sub(" .*", "", trimws(stringi::stri_split(yaml::read_yam
 install.packages(uapply(deps_to_scan, libs_sub), dependencies = TRUE)
 ```
 
+## IPC
+
+The app uses the R package `liteq` for inter-process communication, and
+thus requires a specific file to use as a thread-safe database. We will
+also need to set the queue to be writable by the user who will run the
+app. For this example, the `shiny` user will run the app. This user is
+also a member of the `shiny` group, who will receive write access to the
+directory and file. To set this up, we will need to run the following
+chunk in a terminal, then the second chunk in R:
+
+``` sh
+mkdir db/
+chgrp -R shiny db/
+chmod -R g+ws db/
+```
+
+``` r
+install.packages("liteq")
+liteq::ensure_queue("timerq", db = "db/timerq")
+```
+
 ## DBMS
 
 The app uses a database to store pets, actions, and events. The db
@@ -45,15 +66,10 @@ connection parameters are configured by the `golem_opts$dbi` field (see
 `R/run_app.R`). The DSN name is taken from the `inst/golem-config.yml`
 file, depending on which mode is set in `.Renviron`.
 
-The `dbInterface` class accepts two required initialization parameters,
-`drv` and `dsn`. These correspond to a database driver and a data source
-name (DSN). Currently, the app connects to a DSN named `KPthorSQL` using
-an `ODBC` driver.
-
 Once the driver and DSN are configured on your machine, the database
 will need to then be loaded with tables that are required by the app.
-Functions to create these tables can be found in `R/class_dbInterface.R`
-with the `create_if_not_exist*()` naming pattern.
+Functions to create these tables can be found in
+`R/class_dbInterface.R`.
 
 todo: if no required tables are found, a local SQLite db is created to
 store info during each session
@@ -68,9 +84,10 @@ sudo apt install -y unixodbc-dev odbcinst odbc-postgresql
 
 ### KPthorSQL
 
-The DSN name used for production is `KPthorSQL`, but supports a `dev`
-mode which uses the `KPthorSQL-dev` DSN name. Add the following entry to
-`/etc/odbc.ini`, and fill in your specific connection details:
+The DSN name used for production is `KPthorSQL`, but supports a
+`development` mode which uses the `KPthorSQL-dev` DSN name. Add the
+following entry to `/etc/odbc.ini`, and fill in your specific connection
+details:
 
 ``` ini
 [KPthorSQL]
