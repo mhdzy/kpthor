@@ -15,11 +15,13 @@
 
 ## Dependencies ----
 ## Add one line by package you want to add as dependency
+usethis::use_package( "base" )
 usethis::use_package( "DBI" )
 usethis::use_package( "DT" )
 usethis::use_package( "covr" , type = "suggests" )
 usethis::use_package( "devtools" , type = "suggests" )
 usethis::use_package( "dplyr" )
+usethis::use_package( "htmltools" )
 usethis::use_package( "keyring" )
 usethis::use_package( "liteq" )
 usethis::use_package( "logger" )
@@ -35,6 +37,7 @@ usethis::use_package( "shinyWidgets" )
 usethis::use_package( "stringi" )
 usethis::use_package( "tibble" )
 usethis::use_package( "tidyselect" )
+usethis::use_package( "utils" )
 
 ## Dependency Management ----
 renv::snapshot(type = "explicit")

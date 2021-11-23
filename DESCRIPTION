@@ -5,11 +5,13 @@ Authors@R: person('MH', 'ZYXW', email = 'mhzyxw@gmail.com', role = c('cre', 'aut
 Description: A PWA to track your pet.
 License: MIT + file LICENSE
 Imports: 
+    base,
     config (>= 0.3.1),
     DBI,
     dplyr,
     DT,
     golem (>= 0.3.1),
+    htmltools,
     liteq,
     logger,
     lubridate,
