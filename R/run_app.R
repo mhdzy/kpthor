@@ -6,6 +6,7 @@
 #'
 #' @export
 #' @importFrom golem with_golem_options
+#' @importFrom liteq ensure_queue
 #' @importFrom lubridate hour minute
 #' @importFrom odbc odbc
 #' @importFrom shiny shinyApp
@@ -31,15 +32,16 @@ run_app <- function(
         # drv defined in /etc/odbcinst.ini
         drv = odbc::odbc(),
         # dsn defined in /etc/odbc.ini
-        dsn = "KPthorSQL"
+        dsn = get_golem_config("app_dsn")
       ),
+      timerq = ensure_queue("timerq", db = "db/timerq"),
       time_vars = list(
-        hour = uvars(0L, 24L, 1L, lubridate::hour, "gray"),
+        hour   = uvars(0L, 24L, 1L, lubridate::hour,   "gray"),
         minute = uvars(0L, 60L, 1L, lubridate::minute, "gray")
       ),
       actions = list(
-        walk = avars("walk", "start walk", "end walk"),
-        out = avars("out", "go outside", "come inside"),
+        walk  = avars("walk",  "start walk",  "end walk"),
+        out   = avars("out",   "go outside",  "come inside"),
         sleep = avars("sleep", "go to sleep", "wake up")
       ),
       inputs = list(
@@ -48,8 +50,8 @@ run_app <- function(
         poop = c("poop", "poop", "deeporange")
       ),
       food_vars = list(
-        food = uvars(0, 3, 0.5, 1.5, "teal"),
-        water = uvars(0, 5, 0.5, 1.0, "lightblue")
+        food  = uvars(0L, 3L, 0.5, 1.5, "teal"),
+        water = uvars(0L, 5L, 0.5, 1.0, "lightblue")
       ),
       play_vars = list(
         play = uvars(0L, 60L, 5L, 30L, "purple"),
@@ -57,7 +59,7 @@ run_app <- function(
       ),
       poop_vars = list(
         poop = uvars(0L, 3L, 1L, 1L, "deeporange"),
-        pee = uvars(0L, 3L, 1L, 1L, "yellow")
+        pee  = uvars(0L, 3L, 1L, 1L, "yellow")
       )
     )
   )

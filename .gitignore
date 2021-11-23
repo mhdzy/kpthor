@@ -1,7 +1,12 @@
+# default ignore via .Rproj
 .Rproj.user
 .Rhistory
 .Rdata
 .httr-oauth
 .DS_Store
 
+# ignore tmp db storage
+db/
+
+# ignore published .dcf records
 rsconnect/
