@@ -1,1 +1,2 @@
-GOLEM_CONFIG_ACTIVE="development"
+GOLEM_CONFIG_ACTIVE="default"
+#GOLEM_CONFIG_ACTIVE="development"

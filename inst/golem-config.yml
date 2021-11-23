@@ -8,7 +8,7 @@ dev: &dev
   golem_wd: !expr here::here()
 development:
   <<: *dev
-  app_dsn: "KPthorSQL-dev"
+  app_dsn: "KPthorSQL"
 production:
   <<: *defaults
   app_prod: yes
