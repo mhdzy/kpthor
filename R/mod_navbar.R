@@ -30,7 +30,9 @@ mod_navbar_server <- function(id) {
     output$message <- renderUI({
       local <- hour(Sys.time())
       greeting <-
-        if (0 <= local && local < 12) {
+        if (identical("development", Sys.getenv("GOLEM_CONFIG_ACTIVE"))) {
+          "dev mode"
+        } else if (0 <= local && local < 12) {
           "morning"
         } else if (12 <= local && local < 18) {
           "afternoon"
@@ -41,7 +43,7 @@ mod_navbar_server <- function(id) {
         } else {
           "<sys err>"
         }
-     log_trace("{id} time-of-day greeting found: '{local}', '{greeting}'")
+      log_trace("[{id}] time-of-day greeting found: '{local}', '{greeting}'")
 
       h2(paste0("good ", greeting, ", ", get_golem_options("pet"), "."))
     })

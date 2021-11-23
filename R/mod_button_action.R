@@ -20,8 +20,9 @@ mod_button_action_ui <- function(id) {
 #'
 #' @noRd
 #'
+#' @importFrom liteq ack consume is_empty list_messages publish try_consume
 #' @importFrom logger log_trace
-#' @importFrom lubridate seconds_to_period hour minute second
+#' @importFrom lubridate seconds_to_period hour minute second seconds
 #' @importFrom shiny moduleServer tagList observe observeEvent reactive
 #' @importFrom shiny reactiveVal reactiveValues req renderUI isolate div
 #' @importFrom shinyMobile f7Row f7Col f7Button updateF7Button f7Block f7BlockHeader
@@ -35,11 +36,10 @@ mod_button_action_server <- function(id, datetime) {
     action_struct <- get_golem_options(id)
 
     # active_timer_* are reactive values used to administer the timer mechanism
-    active_timer_stat <- reactiveVal(FALSE)
     active_timer_mode <- reactiveVal("")
     active_timer_time <- reactiveVal(0)
     active_timer_nice <- reactive({
-      req(active_timer_stat())
+      if (!nchar(active_timer_mode())) return("")
       pd <- seconds_to_period(active_timer_time())
       pt_time <- c(hr = hour(pd), min = minute(pd), sec = second(pd))
       pt_time <- pt_time[pt_time != 0]
@@ -51,7 +51,49 @@ mod_button_action_server <- function(id, datetime) {
     observe({
       invalidateLater(1000)
       isolate({
-        if (active_timer_stat()) active_timer_time(active_timer_time() + 1)
+        timerq <- get_golem_options("timerq")
+        if (!is_empty(timerq)) {
+          # fetch message from queue to parse and immediately republish fetched message to the queue
+          msg <- try_consume(timerq)
+          publish(timerq, title = msg$title, message = msg$message)
+
+          # acknowledge "working" message from queue for safe removal of object
+          ack(msg)
+
+          # if msg contains a timer we aren't tracking, update our mode
+          if (active_timer_mode() != msg$title) active_timer_mode(msg$title)
+
+          # set timer time as diff from start and curr
+          active_timer_time(round(as.numeric(Sys.time() - as.POSIXlt(msg$message), units = "secs"), 0L))
+
+          # TODO: make this not brute-forced
+          # sets active timer button to red
+          updateF7Button(
+            inputId = action_struct[[active_timer_mode()]][['name']],
+            label = action_struct[[active_timer_mode()]][['end_label']],
+            color = action_struct[[active_timer_mode()]][['end_color']]
+          )
+          # TODO: make this not brute-forced
+          # clears out non-active timer rows to blue
+          lapply(names(action_struct)[!(names(action_struct) %in% active_timer_mode())], function(x) {
+            updateF7Button(
+              inputId = action_struct[[x]][['name']],
+              label = action_struct[[x]][['start_label']],
+              color = action_struct[[x]][['start_color']]
+            )
+          })
+        } else {
+          # clear everybody out
+          active_timer_mode("")
+          active_timer_time(0)
+          lapply(names(action_struct), function(x) {
+            updateF7Button(
+              inputId = action_struct[[x]][['name']],
+              label = action_struct[[x]][['start_label']],
+              color = action_struct[[x]][['start_color']]
+            )
+          })
+        }
       })
     })
 
@@ -138,6 +180,8 @@ mod_button_action_server <- function(id, datetime) {
       req(button_pressed())
       log_trace("[{id}] button press detected: {button_pressed()}")
 
+      timerq <- get_golem_options("timerq")
+
       type <-
         if (identical("", active_timer_mode())) {
           "new"
@@ -163,7 +207,8 @@ mod_button_action_server <- function(id, datetime) {
         get_golem_options("dbi")$append("kpthor", "events", df)
         log_debug("[{id}] appended ", nrow(df), " rows to kpthor.events")
 
-        active_timer_stat(FALSE)
+        # remove the active timer mode from the queue to "stop" the timer
+        ack(try_consume(timerq))
         active_timer_mode("")
         active_timer_time(0)
         updateF7Button(
@@ -174,7 +219,8 @@ mod_button_action_server <- function(id, datetime) {
       }
 
       if (type == "new" || type == "swap") {
-        active_timer_stat(TRUE)
+        # publish the timer type & status to the queue
+        publish(timerq, title = button_pressed(), message = as.character(Sys.time()))
         active_timer_mode(button_pressed())
         updateF7Button(
           inputId = active_timer_mode(),

@@ -35,6 +35,8 @@ uvars <- function(min = 0L, max = 0L, step = 0L, value = 0L, color = "white") {
 #' @param start_color A label to display when active (ready to end).
 #' @param end_color A label to display when inactive (ready to start).
 #'
+#' @return A named list with 'active'/'inactive' shinyMobile::f7Button inputs.
+#'
 #' @noRd
 avars <- function(name, start_label, end_label, start_color = "blue", end_color = "red") {
   return(
