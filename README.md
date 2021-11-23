@@ -86,8 +86,8 @@ sudo apt install -y unixodbc-dev odbcinst odbc-postgresql
 
 The DSN name used for production is `KPthorSQL`, but supports a
 `development` mode which uses the `KPthorSQL-dev` DSN name. Add the
-following entry to `/etc/odbc.ini`, and fill in your specific connection
-details:
+following entry to `/etc/odbc.ini` (`~/.odbc.ini` on macOS), and fill in
+your specific connection details:
 
 ``` ini
 [KPthorSQL]
@@ -102,7 +102,8 @@ Port=5432
 
 ### ODBC
 
-The ODBC driver used Add the following entry to `/etc/odbcinst.ini`:
+The ODBC driver needs to downloaded from the internet. Add the following
+entry to `/etc/odbcinst.ini`:
 
 ``` ini
 [PostgreSQL Default]
