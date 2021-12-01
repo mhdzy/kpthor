@@ -53,7 +53,14 @@ app_ui <- function(request) {
             tabName = "monitor",
             icon = f7Icon("graph_square"),
 
-            mod_monitor_ui("monitor"),
+            mod_monitor_ui("monitor")
+          ),
+
+          ## table ----
+          f7Tab(
+            tabName = "table",
+            icon = f7Icon("table_badge_more"),
+
             mod_table_ui("table")
           ),
 
