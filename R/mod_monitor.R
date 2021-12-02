@@ -23,7 +23,7 @@ mod_monitor_ui <- function(id) {
           id = ns("intake"),
           title = "food",
           subtitle = uiOutput(ns("food")),
-          uiOutput(ns("food_content"))
+          plotlyOutput(ns("food_content"))
         )
       ),
       f7Col(
@@ -31,7 +31,7 @@ mod_monitor_ui <- function(id) {
           id = ns("playtake"),
           title = "play",
           subtitle = uiOutput(ns("play")),
-          uiOutput(ns("play_content"))
+          plotlyOutput(ns("play_content"))
         )
       ),
       f7Col(
@@ -39,7 +39,7 @@ mod_monitor_ui <- function(id) {
           id = ns("outtake"),
           title = "out",
           subtitle = uiOutput(ns("poop")),
-          uiOutput(ns("poop_content"))
+          plotlyOutput(ns("poop_content"))
         )
       )
     )
@@ -149,17 +149,17 @@ mod_monitor_server <- function(id, appdata, datetime) {
       )
     })
 
-    output$food_content <- renderUI({
+    output$food_content <- renderPlotly({
       tod_data(c("food", "water")) |>
         plotly_format()
     })
 
-    output$play_content <- renderUI({
+    output$play_content <- renderPlotly({
       tod_data(c("out", "play", "walk")) |>
         plotly_format()
     })
 
-    output$poop_content <- renderUI({
+    output$poop_content <- renderPlotly({
       tod_data(c("pee", "poop")) |>
         plotly_format()
     })
