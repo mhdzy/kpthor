@@ -18,7 +18,7 @@ app_ui <- function(request) {
       title = "kpthor",
       preloader = TRUE,
       allowPWA = TRUE,
-      loading_duration = 1L,
+      loading_duration = 2L,
 
       f7TabLayout(
         navbar = f7Navbar(
