@@ -6,9 +6,13 @@
 #' @noRd
 #'
 #' @importFrom logger log_threshold log_layout layout_glue_colors TRACE
+#' @importFrom shiny reactive
+#'
 app_server <- function( input, output, session ) {
   log_threshold(TRACE)
   log_layout(layout_glue_colors)
+
+  session$allowReconnect(TRUE)
 
   refresh_pull <- reactive(input$ptr)
   refresh_tabs <- reactive(input$f7_tabs)
