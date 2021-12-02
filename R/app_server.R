@@ -25,8 +25,7 @@ app_server <- function( input, output, session ) {
   mod_popup_box_server("play_vars", input_row$play, datetime)
   mod_popup_box_server("poop_vars", input_row$poop, datetime)
 
-  mod_table_server("table", refresh_pull, refresh_tabs, datetime)
-
-  mod_monitor_server("monitor")
+  mod_monitor_server("monitor", appdata, datetime)
+  mod_table_server("table", appdata, datetime)
   mod_settings_server("settings")
 }
