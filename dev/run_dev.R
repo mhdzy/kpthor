@@ -28,7 +28,7 @@ shinyMobile::preview_mobile(
 unlist(lapply(paste("kill -9", test_pid), system))
 
 # reload dev libraries from pkg DESCRIPTION file
-# this needs to be a function since the lib load code doesnt' always run itself
+# this needs to be a function since the lib load code doesn't always run itself
 dev <- function() {
   libs_sub <- function(x) sub(" .*", "", trimws(stringi::stri_split(yaml::read_yaml("DESCRIPTION")[[x]], fixed = ",")[[1]]))
   libs_req_sug <- c(libs_sub("Imports"), libs_sub("Suggests"))
