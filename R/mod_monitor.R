@@ -22,21 +22,24 @@ mod_monitor_ui <- function(id) {
         f7ExpandableCard(
           id = ns("intake"),
           title = "food",
-          subtitle = uiOutput(ns("food"))
+          subtitle = uiOutput(ns("food")),
+          uiOutput(ns("food_content"))
         )
       ),
       f7Col(
         f7ExpandableCard(
           id = ns("playtake"),
           title = "play",
-          subtitle = uiOutput(ns("play"))
+          subtitle = uiOutput(ns("play")),
+          uiOutput(ns("play_content"))
         )
       ),
       f7Col(
         f7ExpandableCard(
           id = ns("outtake"),
           title = "out",
-          subtitle = uiOutput(ns("poop"))
+          subtitle = uiOutput(ns("poop")),
+          uiOutput(ns("poop_content"))
         )
       )
     )
@@ -48,6 +51,8 @@ mod_monitor_ui <- function(id) {
 #' @noRd
 #'
 #' @importFrom dplyr filter group_by mutate n select summarise
+#' @importFrom ggplot2 aes ggplot geom_point
+#' @importFrom plotly ggplotly
 #' @importFrom shiny moduleServer
 #'
 mod_monitor_server <- function(id, appdata, datetime) {
@@ -58,9 +63,14 @@ mod_monitor_server <- function(id, appdata, datetime) {
     # appdata$data()
     # datetime$date()
 
-    agg_data <- reactive({
+    today_data <- reactive({
       appdata$data() |>
-        filter(date == datetime$date()) |>
+        filter(date == datetime$date())
+    })
+
+    # transforms the daily (selected) data to totals & counts by action
+    total_count_data <- reactive({
+      today_data() |>
         group_by(action) |>
         summarise(
           total = sum(as.numeric(value)),
@@ -68,49 +78,90 @@ mod_monitor_server <- function(id, appdata, datetime) {
         )
     })
 
-    # act_data
+    # tc_data
     #
-    # Get the actual (aggregated) data for a particular `action` and `type`.
+    # Get the actual (aggregated) total count data for a particular `action` and `type`.
     #
-    # @param action A valid input 'action', eg. 'food', 'water', 'play'
-    # @param type A column to return from the data
+    # @param act A valid input action, eg. 'food', 'water', 'play'.
+    # @param type A column to return from the data.
     #
-    act_data <- function(act, type) {
-      return((agg_data() |> filter(action == act))[[type]])
+    tc_data <- function(act, type) {
+      return((total_count_data() |> filter(action %in% act))[[type]])
     }
 
-    # act_form
+    # tod_data
     #
-    # Get the HTML formatted sprintf display string for the monitor panels.
+    # Get the daily (selected via input date) raw data.
     #
-    # @param string The sprintf-formatted string
-    # @param ... The sprintf variables, must match order in `string`
-    act_form <- function(string, ...) {
+    # @param act A valid input action, eg. 'food', 'water', 'play'.
+    #
+    tod_data <- function(act) {
+      return(
+        today_data() |>
+          mutate(datetime = as.POSIXct(paste0(date, " ", time, ":", minute))) |>
+          filter(action %in% act) |>
+          group_by(datetime, action) |>
+          summarise(total = sum(as.numeric(value)))
+      )
+    }
+
+    # html_format
+    #
+    # Get the HTML formatted sprintf display string.
+    #
+    # @param string The sprintf-formatted string.
+    # @param ... The sprintf variables, must match order in `string`.
+    #
+    html_format <- function(string, ...) {
       return(HTML(sprintf(string, ...)))
     }
 
+    plotly_format <- function(dat) {
+      (
+        dat |>
+          ggplot(aes(x = datetime, y = total, color = action)) +
+          geom_point()
+      ) |>
+        ggplotly()
+    }
+
     output$food <- renderUI({
-      act_form(
+      html_format(
         "%s cups food<br>%s cups water",
-        act_data("food", "total"),
-        act_data("water", "total")
+        tc_data("food", "total"),
+        tc_data("water", "total")
       )
     })
 
     output$play <- renderUI({
-      act_form(
+      html_format(
         "played for %s mins<br>walked for %s mins",
-        act_data("play", "total"),
-        act_data("walk", "total")
+        tc_data("play", "total"),
+        tc_data("walk", "total")
       )
     })
 
     output$poop <- renderUI({
-      act_form(
+      html_format(
         "peed %s times<br>pooped %s times",
-        act_data("pee", "count"),
-        act_data("poop", "count")
+        tc_data("pee", "count"),
+        tc_data("poop", "count")
       )
+    })
+
+    output$food_content <- renderUI({
+      tod_data(c("food", "water")) |>
+        plotly_format()
+    })
+
+    output$play_content <- renderUI({
+      tod_data(c("out", "play", "walk")) |>
+        plotly_format()
+    })
+
+    output$poop_content <- renderUI({
+      tod_data(c("pee", "poop")) |>
+        plotly_format()
     })
 
   })
