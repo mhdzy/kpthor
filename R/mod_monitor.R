@@ -6,6 +6,7 @@
 #'
 #' @noRd
 #'
+#' @importFrom plotly plotlyOutput
 #' @importFrom shiny NS tagList
 #' @importFrom shinyMobile f7Row f7Col f7ExpandableCard
 mod_monitor_ui <- function(id) {
@@ -52,7 +53,7 @@ mod_monitor_ui <- function(id) {
 #'
 #' @importFrom dplyr filter group_by mutate n select summarise
 #' @importFrom ggplot2 aes ggplot geom_point
-#' @importFrom plotly ggplotly
+#' @importFrom plotly ggplotly renderPlotly
 #' @importFrom shiny moduleServer
 #'
 mod_monitor_server <- function(id, appdata, datetime) {
