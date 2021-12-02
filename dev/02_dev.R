@@ -44,6 +44,8 @@ renv::snapshot(type = "explicit")
 
 ## Add modules ----
 ## Create a module infrastructure in R/
+golem::add_module( name = "data" )
+
 golem::add_module( name = "inputs" )
 golem::add_module( name = "navbar" )
 
@@ -63,7 +65,6 @@ golem::add_module( name = "settings" )
 golem::add_fct( "db" )
 
 golem::add_utils( "vars" )
-golem::add_utils( "datetime" )
 
 ## External resources
 ## Creates .js and .css files at inst/app/www

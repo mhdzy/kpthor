@@ -13,6 +13,8 @@ app_server <- function( input, output, session ) {
   refresh_pull <- reactive(input$ptr)
   refresh_tabs <- reactive(input$f7_tabs)
 
+  appdata <- mod_data_server("data", refresh_pull, refresh_tabs)
+
   mod_navbar_server("navbar")
 
   datetime <- mod_datetime_row_server("time_vars")
