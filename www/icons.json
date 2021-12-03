@@ -1,12 +1,4 @@
 {
-  "name": "KP Thor",
-  "short_name": "kpthor",
-  "description": "A PWA to track your pet.",
-  "lang": "en-US",
-  "start_url": "/",
-  "display": "standalone",
-  "theme_color": "#0f327c",
-  "background_color": "#060e1f",
   "icons": [
     {
       "src": "android/android-launchericon-512-512.png",
@@ -135,3 +127,6 @@
     {
       "src": "ios/1024.png",
       "sizes": "1024x1024"
+    }
+  ]
+}

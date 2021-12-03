@@ -13,7 +13,7 @@ add_pwa_deps <- function(tag) {
   version = packageVersion("kpthor"),
   src = c(file = "kpthor-0.0.0.9000"),
   head = "<link rel=\"manifest\" href=\"manifest.webmanifest\"  />
-<link rel=\"icon\" type=\"image/png\" href=\"icons/icon-144.png\" sizes=\"144x144\" />",
+<link rel=\"icon\" type=\"image/png\" href=\"ios/144.png\" sizes=\"144x144\" />",
   package = "kpthor",
  )
  tagList(tag, pwa_deps)

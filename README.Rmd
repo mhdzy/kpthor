@@ -13,7 +13,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-# { kpthor } <img src="inst/app/www/favicon.ico" align="right" width="120"/>
+# { kpthor } <img src="www/favicon.ico" align="right" width="120"/>
 
 <!-- badges: start -->
 [![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
