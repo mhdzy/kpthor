@@ -69,6 +69,22 @@ mod_monitor_server <- function(id, appdata, datetime) {
         filter(date == datetime$date())
     })
 
+    # tod_data
+    #
+    # Get the daily (selected via input date) raw data.
+    #
+    # @param act A valid input action, eg. 'food', 'water', 'play'.
+    #
+    tod_data <- function(act) {
+      return(
+        today_data() |>
+          mutate(datetime = as.POSIXct(paste0(date, " ", time, ":", minute))) |>
+          filter(action %in% act) |>
+          group_by(datetime, action) |>
+          summarise(total = sum(as.numeric(value)))
+      )
+    }
+
     # transforms the daily (selected) data to totals & counts by action
     total_count_data <- reactive({
       today_data() |>
@@ -88,22 +104,6 @@ mod_monitor_server <- function(id, appdata, datetime) {
     #
     tc_data <- function(act, type) {
       return((total_count_data() |> filter(action %in% act))[[type]])
-    }
-
-    # tod_data
-    #
-    # Get the daily (selected via input date) raw data.
-    #
-    # @param act A valid input action, eg. 'food', 'water', 'play'.
-    #
-    tod_data <- function(act) {
-      return(
-        today_data() |>
-          mutate(datetime = as.POSIXct(paste0(date, " ", time, ":", minute))) |>
-          filter(action %in% act) |>
-          group_by(datetime, action) |>
-          summarise(total = sum(as.numeric(value)))
-      )
     }
 
     # html_format
@@ -137,7 +137,7 @@ mod_monitor_server <- function(id, appdata, datetime) {
     output$play <- renderUI({
       html_format(
         "played for %s mins<br>walked for %s mins",
-        tc_data("play", "total"),
+        tc_data(c("play", "out"), "total"),
         tc_data("walk", "total")
       )
     })
