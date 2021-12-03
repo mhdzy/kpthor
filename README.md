@@ -23,21 +23,29 @@ experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](h
 This app requires `R (>= 4.0)`, available for download at
 <https://cloud.r-project.org/>.
 
-### pkgs
+### packages
 
 To run the app, a few R package dependencies are needed. These are
-documented in the `DESCRIPTION` file, but the code below will also
-install all packages (and their dependencies) imported (and suggested)
-by the app.
+documented in the `DESCRIPTION` file, but the code below will install
+all packages (and their dependencies) imported by the app.
 
 ``` r
 deps_to_scan <- c("Imports", "Suggests")
 uapply <- function(...) unlist(lapply(...))
-libs_sub <- function(x) sub(" .*", "", trimws(stringi::stri_split(yaml::read_yaml("DESCRIPTION")[[x]], fixed = ",")[[1]]))
+libs_sub <- function(x) sub(
+  " .*", 
+  "", 
+  trimws(
+    stringi::stri_split(
+      yaml::read_yaml("DESCRIPTION")[[x]], 
+      fixed = ","
+    )[[1]]
+  )
+)
 install.packages(uapply(deps_to_scan, libs_sub), dependencies = TRUE)
 ```
 
-## IPC
+## IPC / streaming
 
 The app uses the R package `liteq` for inter-process communication, and
 thus requires a specific file to use as a thread-safe database. We will
@@ -71,51 +79,18 @@ will need to then be loaded with tables that are required by the app.
 Functions to create these tables can be found in
 `R/class_dbInterface.R`.
 
-todo: if no required tables are found, a local SQLite db is created to
-store info during each session
-
-### system libraries
-
-The following libraries are required for ODBC integration.
-
-``` sh
-sudo apt install -y unixodbc-dev odbcinst odbc-postgresql
-```
-
-### KPthorSQL
+### DSN configuration
 
 The DSN name used for production is `KPthorSQL`, but supports a
 `development` mode which uses the `KPthorSQL-dev` DSN name. Add the
-following entry to `/etc/odbc.ini` (`~/.odbc.ini` on macOS), and fill in
-your specific connection details:
+contents of `config/etc/odbc.ini` to your host server’s `/etc/odbc.ini`
+file (`~/.odbc.ini` on macOS), and fill in your specific connection
+details.
 
-``` ini
-[KPthorSQL]
-Driver=PostgreSQL Default
-Description=KPthorSQL DSN
-User=my_database_username
-Password=my_database_password
-Database=apps
-Server=192.168.0.xxx
-Port=5432
-```
+### Driver configuration
 
-### ODBC
-
-The ODBC driver needs to downloaded from the internet. Add the following
-entry to `/etc/odbcinst.ini`:
-
-``` ini
-[PostgreSQL Default]
-Description=PostgreSQL ODBC driver
-Driver=psqlodbcw.so
-Setup=libodbcpsqlS.so
-Debug=0
-CommLog=1
-FileUsage=1
-Threading=2
-UsageCount=1
-```
+The ODBC driver needs to downloaded from the internet. Add the contents
+of `config/etc/odbcinst.ini` to your server’s `/etc/odbcinst.ini` file.
 
 # Installation
 
@@ -135,17 +110,54 @@ git clone git@github.com:mhdzy/kpthor.git
 
 # Run App
 
-This is how you run the app locally:
+This is how you run the app from the package (prod):
 
 ``` r
 # library(kpthor)
 kpthor::run_app()
 ```
 
+This is how you run the app from the repository (dev):
+
+``` r
+# setwd("kpthor/")
+runApp("app.R")
+```
+
 # Host App
+
+The app was primarily developed on macOS 11.16 running R 4.1.0 with an
+i7 processor and 32GB RAM.
+
+I hosted this app on a Raspberry Pi 4 Model B (4 GB) running Raspbian
+(arm64) ([download
+here](https://downloads.raspberrypi.org/raspios_arm64/images/raspios_arm64-2021-05-28/)).
+This required building Shiny Server from source, and I loosely followed
+[this
+guide](https://community.rstudio.com/t/setting-up-your-own-shiny-server-rstudio-server-on-a-raspberry-pi-3b/18982)
+from `andresrcs`. There is also an update guide using Ansible, available
+[here](https://andresrcs.rbind.io/2021/01/13/raspberry_pi_server/).
 
 ## Local
 
+Install R, package dependencies (see `DESCRIPTION`), setup PostgreSQL,
+configure the OS files found in `config/`, then run the app.
+
+TODO
+
+-   [ ] Failover to RSQLite temporary in-memory db when Postgres is
+    unavailable.
+
 ## Shiny Server
 
-## RStudio Connect
+Deploying the `kpthor` app to Shiny Server requires a live Shiny Server
+installation, available for download here:
+<https://www.rstudio.com/products/shiny/download-server/>.
+
+The config file is found in `config/etc/shiny-server/shiny-server.conf`.
+
+### X11 / Xvfb
+
+Viewing plots and graphics requires a window service, and the file
+`config/etc/init/shiny-server.conf` contains the startup script to
+enable Xvfb (X virtual framebuffer).
