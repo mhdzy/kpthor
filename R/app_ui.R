@@ -109,6 +109,13 @@ golem_add_external_resources <- function() {
 
   tags$head(
     favicon(),
+
+    tags$link(rel = "icon", href = "favicon.ico"),
+    tags$link(rel = "shortcut icon", href = "favicon.ico"),
+    tags$link(rel = "apple-touch-icon", sizes = "180x180", href = "favicon.ico"),
+    tags$link(rel = "icon", type = "image/png", sizes = "64x64", href = "ios/64x64.png"),
+    tags$link(rel = "icon", type = "image/png", sizes = "32x32", href = "ios/32x32.png"),
+
     bundle_resources(
       path = app_sys('app/www'),
       app_title = 'kpthor'
