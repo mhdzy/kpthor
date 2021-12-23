@@ -46,7 +46,9 @@ mod_data_server <- function(id, refresh_pull, refresh_tabs) {
 
     df_data <- eventReactive(refresh(), {
       log_trace("[{id}] df refresh")
-      get_golem_options("dbi")$query_self_param_clear("kpthor", "events")
+      get_golem_options("dbi")$query_self_param_clear(
+        get_golem_options("schema"), get_golem_options("table")
+      )
     })
 
     return(

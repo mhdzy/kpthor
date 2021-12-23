@@ -31,5 +31,6 @@ app_server <- function( input, output, session ) {
 
   mod_monitor_server("monitor", appdata, datetime)
   mod_table_server("table", appdata, datetime)
+  mod_report_server("report", appdata, datetime)
   mod_settings_server("settings")
 }

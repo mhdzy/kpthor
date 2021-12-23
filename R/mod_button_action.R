@@ -215,9 +215,29 @@ mod_button_action_server <- function(id, datetime) {
           pet = get_golem_options("pet"),
           action = mode,
           value = time
+        ) |> dplyr::mutate(
+          hash = purrr::map_chr(paste0(date, time, minute, pet, action, value), digest::digest, algo = "sha256")
         )
-        get_golem_options("dbi")$append("kpthor", "events", df)
-        log_debug("[{id}] appended ", nrow(df), " rows to kpthor.events")
+
+        currtbl <- get_golem_options("dbi")$query(
+          paste0(
+            "select * from ",
+            get_golem_options("schema"), ".", get_golem_options("table"), ";"
+          )
+        )
+
+        if (df$hash %in% currtbl$hash) {
+          f7Dialog(
+            id = ns("error"),
+            title = "Duplicate Event Rejected!",
+            text = "You (or your device) submitted an event which currently exists.",
+            type = "alert"
+          )
+          log_warn("[{id}] append attempt blocked with hash {df$hash}")
+        } else {
+          get_golem_options("dbi")$append(get_golem_options("schema"), get_golem_options("table"), df)
+          log_debug("[{id}] appended ", nrow(df), " rows to {get_golem_options('schema')}.{get_golem_options('table')}")
+        }
 
         # remove the active timer mode from the queue to "stop" the timer
         liteq::ack(try_consume(timerq))

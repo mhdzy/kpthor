@@ -30,22 +30,24 @@ mod_table_server <- function(id, appdata, datetime) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
 
+    localdata <- reactive({
+      appdata$data() %>%
+        filter(
+          date == datetime$date(),
+          pet == get_golem_options("pet")
+        ) %>%
+        select(
+          -c(pet, hash)
+        ) %>%
+        arrange(
+          desc(time),
+          desc(minute)
+        )
+    })
+
     output$table <- renderUI({
       log_trace("[{id}] table render")
-      f7Table(
-        appdata$data() %>%
-          filter(
-            date == datetime$date(),
-            pet == get_golem_options("pet")
-          ) %>%
-          select(
-            -c(pet)
-          ) %>%
-          arrange(
-            desc(time),
-            desc(minute)
-          )
-      )
+      f7Table(localdata())
     })
 
   })

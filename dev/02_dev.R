@@ -17,6 +17,7 @@
 ## Add one line by package you want to add as dependency
 usethis::use_package( "base" )
 usethis::use_package( "DBI" )
+usethis::use_package( "digest" )
 usethis::use_package( "DT" )
 usethis::use_package( "covr" , type = "suggests" )
 usethis::use_package( "devtools" , type = "suggests" )
@@ -29,6 +30,7 @@ usethis::use_package( "logger" )
 usethis::use_package( "lubridate" )
 usethis::use_package( "magrittr" )
 usethis::use_package( "plotly" )
+usethis::use_package( "purrr" )
 usethis::use_package( "R6" )
 usethis::use_package( "renv" )
 usethis::use_package( "RPostgres" )
@@ -59,6 +61,7 @@ golem::add_module( name = "popup_box" )
 
 golem::add_module( name = "monitor" )
 golem::add_module( name = "table" )
+golem::add_module( name = "report" )
 
 golem::add_module( name = "settings" )
 
