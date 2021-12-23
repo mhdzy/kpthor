@@ -28,7 +28,7 @@ mod_report_ui <- function(id) {
 #' @importFrom dplyr filter select arrange desc
 #' @importFrom golem get_golem_options
 #' @importFrom logger log_trace log_warn
-#' @importFrom shiny moduleServer reactive renderUI
+#' @importFrom shiny moduleServer reactive renderUI observeEvent
 #' @importFrom shinyMobile f7Picker f7SwipeoutItem f7Dialog
 #'
 #' @noRd

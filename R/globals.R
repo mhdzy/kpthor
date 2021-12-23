@@ -40,7 +40,11 @@ declare_global_variables <- function() {
       c(
         # mod_table_server : <anonymous>:
         "pet",
-        "time"
+        "time",
+        "action",
+        "hash",
+        "total",
+        "value"
       )
     )
   )
