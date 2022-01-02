@@ -1,0 +1,20 @@
+
+.centered {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 22vh;
+}
+
+.centered-no-vh {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.centered-vh {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 22vh;
+}

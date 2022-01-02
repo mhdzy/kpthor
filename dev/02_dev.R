@@ -61,7 +61,7 @@ golem::add_module( name = "popup_box" )
 
 golem::add_module( name = "monitor" )
 golem::add_module( name = "table" )
-golem::add_module( name = "report" )
+golem::add_module( name = "home" )
 
 golem::add_module( name = "settings" )
 
@@ -77,6 +77,8 @@ golem::add_js_file( "script" )
 golem::add_js_handler( "handlers" )
 
 golem::add_css_file( "popup" )
+golem::add_css_file( "photo" )
+golem::add_css_file( "times" )
 
 ## Add internal datasets ----
 ## If you have data in your package
