@@ -52,18 +52,19 @@ mod_popup_box_ui <- function(id) {
 #' @noRd
 #'
 #' @importFrom digest digest
-#' @importFrom dplyr mutate
+#' @importFrom dplyr if_else mutate
 #' @importFrom golem get_golem_options
 #' @importFrom logger log_debug log_trace log_warn
+#' @importFrom magrittr %>%
 #' @importFrom purrr map_chr
 #' @importFrom shiny is.reactive moduleServer observeEvent tagList
 #' @importFrom shiny reactiveValues reactiveValuesToList renderUI
 #' @importFrom shinyjs hide
 #' @importFrom shinyMobile f7Button f7Block f7Col f7Dialog f7Row f7Stepper
 #' @importFrom shinyMobile f7Progress updateF7Progress updateF7Sheet
-mod_popup_box_server <- function(id, sheet_trigger, datetime) {
+mod_popup_box_server <- function(id, sheet_trigger, appdata, appdate) {
   stopifnot(is.reactive(sheet_trigger))
-  stopifnot(is.list(datetime))
+  stopifnot(is.list(appdate))
 
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
@@ -168,25 +169,34 @@ mod_popup_box_server <- function(id, sheet_trigger, datetime) {
         idx <- which(vals != 0)
 
         if (length(idx)) {
-          df <- data.frame(
-            date = datetime$date(),
-            time = datetime$hour(),
-            minute = datetime$minute(),
-            pet = get_golem_options("pet"),
-            action = nams[idx],
-            value = vals[idx]
-          ) |> dplyr::mutate(
-            hash = purrr::map_chr(paste0(date, time, minute, pet, action, value), digest::digest, algo = "sha256")
-          )
+          min_to_sec <- c("play", "walk")
 
-          currtbl <- get_golem_options("dbi")$query(
+          df <-
+            data.frame(
+              pet = get_golem_options("pet"),
+              datetime = lubridate::force_tz(
+                lubridate::ymd_hms(paste0(appdate$date(), " ", appdate$hour(), ":", appdate$minute(), ":", "00")),
+                "America/New_York"
+              ),
+              action = nams[idx],
+              value = vals[idx]
+            ) %>%
+            dplyr::mutate(
+              # TODO: ensure units of 'seconds' for time-based inputs
+              value = dplyr::if_else(action %in% min_to_sec, value * 60, value),
+              hash = purrr::map_chr(paste0(pet, datetime, action, value), digest::digest, algo = "sha256")
+            )
+
+          # live query to ensure we get the latest data, even if user didn't update
+          hashtbl <- get_golem_options("dbi")$query(
             paste0(
-              "select * from ",
+              "select hash from ",
               get_golem_options("schema"), ".", get_golem_options("table"), ";"
             )
           )
 
-          if (df$hash %in% currtbl$hash) {
+          # need to check 'any()' because we may have more than 1 event being added
+          if (any(df$hash %in% hashtbl$hash)) {
             f7Dialog(
               id = ns("error"),
               title = "Duplicate Event Rejected!",

@@ -23,25 +23,25 @@ mod_table_ui <- function(id) {
 #' @importFrom dplyr arrange desc filter select
 #' @importFrom golem get_golem_options
 #' @importFrom logger log_trace log_debug
+#' @importFrom lubridate date
 #' @importFrom magrittr %>%
 #' @importFrom shiny eventReactive invalidateLater renderUI
 #' @importFrom shinyMobile f7Table
-mod_table_server <- function(id, appdata, datetime) {
+mod_table_server <- function(id, appdata, appdate) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
 
     localdata <- reactive({
       appdata$data() %>%
         filter(
-          date == datetime$date(),
+          lubridate::date(datetime) == appdate$date(),
           pet == get_golem_options("pet")
         ) %>%
         select(
-          -c(pet, hash)
+          -c(id, pet, hash)
         ) %>%
         arrange(
-          desc(time),
-          desc(minute)
+          desc(datetime)
         )
     })
 

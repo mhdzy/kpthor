@@ -27,9 +27,9 @@ run_app <- function(
       uiPattern = uiPattern
     ),
     golem_opts = list(
-      pet = "kashi",
+      pet = "Kashi",
       schema = "kpthor",
-      table = "testme",
+      table = "allevents",
       dbi = dbInterface$new(
         # drv defined in /etc/odbcinst.ini
         drv = odbc::odbc(),

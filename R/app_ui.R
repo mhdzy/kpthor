@@ -35,10 +35,9 @@ app_ui <- function(request) {
           f7Tab(
             tabName = "inputs",
             icon = f7Icon("calendar_badge_plus"),
-            active = TRUE,
 
             # static button inputs
-            mod_datetime_row_ui("time_vars"),
+            mod_appdate_row_ui("time_vars"),
             mod_button_action_ui("actions"),
             br(), mod_button_input_ui("inputs"),
 
@@ -56,19 +55,22 @@ app_ui <- function(request) {
             mod_monitor_ui("monitor")
           ),
 
+
+          ## home ----
+          f7Tab(
+            tabName = "home",
+            active = TRUE,
+            icon = f7Icon("house"),
+
+            mod_home_ui("home")
+          ),
+
           ## table ----
           f7Tab(
             tabName = "table",
             icon = f7Icon("table_badge_more"),
 
             mod_table_ui("table")
-          ),
-
-          f7Tab(
-            tabName = "report",
-            icon = f7Icon("square_list"),
-
-            mod_report_ui("report")
           ),
 
           ## settings ----
@@ -85,7 +87,7 @@ app_ui <- function(request) {
       ## options ----
       options = list(
         theme = c("ios"),
-        dark = TRUE,
+        dark = FALSE,
         filled = FALSE,
         color = "#a07aff",
         touch = list(tapHold = TRUE, tapHoldDelay = 750, iosTouchRipple = FALSE),

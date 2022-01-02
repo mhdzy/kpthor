@@ -20,14 +20,16 @@ mod_button_action_ui <- function(id) {
 #'
 #' @noRd
 #'
+#' @importFrom dplyr if_else
 #' @importFrom liteq ack consume is_empty list_messages list_failed_messages requeue_failed_messages publish try_consume
 #' @importFrom logger log_trace
 #' @importFrom lubridate seconds_to_period hour minute second seconds
+#' @importFrom magrittr %>%
 #' @importFrom shiny moduleServer tagList observe observeEvent reactive
 #' @importFrom shiny reactiveVal reactiveValues req renderUI isolate div
 #' @importFrom shinyMobile f7Row f7Col f7Button updateF7Button f7Block f7BlockHeader
 #'
-mod_button_action_server <- function(id, datetime) {
+mod_button_action_server <- function(id, appdata, appdate) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
 
@@ -205,28 +207,34 @@ mod_button_action_server <- function(id, datetime) {
 
       if (type == "same" || type == "swap") {
         mode <- isolate(active_timer_mode())
-        time <- isolate(active_timer_time())
-        log_trace("[{id}] mode '{mode}' ran for '{time}' seconds")
+        timer_time <- isolate(active_timer_time())
+        log_trace("[{id}] mode '{mode}' ran for '{timer_time}' seconds")
 
-        df <- data.frame(
-          date = datetime$date(),
-          time = datetime$hour(),
-          minute = datetime$minute(),
-          pet = get_golem_options("pet"),
-          action = mode,
-          value = time
-        ) |> dplyr::mutate(
-          hash = purrr::map_chr(paste0(date, time, minute, pet, action, value), digest::digest, algo = "sha256")
-        )
+        df <-
+          data.frame(
+            pet = get_golem_options("pet"),
+            datetime = lubridate::force_tz(
+              lubridate::ymd_hms(paste0(appdate$date(), " ", appdate$hour(), ":", appdate$minute(), ":", "00")),
+              "America/New_York"
+            ),
+            action = mode,
+            value = timer_time
+          ) %>%
+          dplyr::mutate(
+            # all timers store values in seconds, no unit conversion
+            # value = dplyr::if_else(action %in% sec_to_min, value/60, value),
+            hash = purrr::map_chr(paste0(pet, datetime, action, value), digest::digest, algo = "sha256")
+          )
 
-        currtbl <- get_golem_options("dbi")$query(
+        # live query to ensure we get the latest data, even if user didn't update
+        hashtbl <- get_golem_options("dbi")$query(
           paste0(
-            "select * from ",
+            "select hash from ",
             get_golem_options("schema"), ".", get_golem_options("table"), ";"
           )
         )
 
-        if (df$hash %in% currtbl$hash) {
+        if (df$hash %in% hashtbl$hash) {
           f7Dialog(
             id = ns("error"),
             title = "Duplicate Event Rejected!",
