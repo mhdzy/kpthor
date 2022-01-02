@@ -26,6 +26,9 @@ mod_data_server <- function(id, refresh_pull, refresh_tabs) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
 
+    dat_cache <- reactiveVal(get_golem_options("dbi")$query_self_param_clear(
+      get_golem_options("schema"), get_golem_options("table")
+    ))
     refresh <- reactiveVal(0L)
 
     # no observeEvent because only act on certain conditions
@@ -44,16 +47,22 @@ mod_data_server <- function(id, refresh_pull, refresh_tabs) {
       }
     })
 
-    df_data <- eventReactive(refresh(), {
+    observeEvent(refresh(), {
       log_trace("[{id}] df refresh")
-      get_golem_options("dbi")$query_self_param_clear(
+      dat_latest <- get_golem_options("dbi")$query_self_param_clear(
         get_golem_options("schema"), get_golem_options("table")
-      )
+      ) %>%
+        dplyr::mutate(datetime = lubridate::force_tz(datetime, "America/New_York"))
+
+      # only update data object if we get new info
+      if (!identical(dat_cache(), dat_latest)) {
+        dat_cache(dat_latest)
+      }
     })
 
     return(
       list(
-        data = reactive(df_data())
+        data = reactive(dat_cache())
       )
     )
 
