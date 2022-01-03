@@ -40,7 +40,7 @@ mod_data_server <- function(id, refresh_pull, refresh_tabs) {
       #
       # also react to tab switch, but only when the user is trying to view
       # information via 'monitor' or 'table' tabs
-      if (!is.null(refresh_pull()) || (refresh_tabs() %in% c("monitor", "table"))) {
+      if (!is.null(refresh_pull()) || (refresh_tabs() %in% c("monitor", "home", "table"))) {
         log_trace("[{id}] data needs refreshing")
         # need to use isolate to prevent this from observing itself & reacting
         isolate(refresh(refresh() + 1))
