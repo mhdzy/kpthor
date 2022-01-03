@@ -6,6 +6,14 @@
   height: 22vh;
 }
 
+.centertime {
+  display: inline-block;
+  justify-content: center;
+  align-items: center;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
 .centered-no-vh {
   display: flex;
   align-items: center;

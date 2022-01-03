@@ -15,7 +15,6 @@ mod_appdate_row_ui <- function(id) {
   tagList(
     f7Row(
       f7Col(
-        width = 6,
         f7DatePicker(
           inputId = ns("date"),
           label = "date",
@@ -26,18 +25,24 @@ mod_appdate_row_ui <- function(id) {
         )
       ),
       f7Col(
-        align = "center",
+        div(
+          class = "block-title",
+          "time"
+        ),
         lapply(
           seq_along(get_golem_options(id)),
           function(x) {
             golem_opts <- get_golem_options(id)
             f7Row(
-              f7Col(
-                align = "left",
-                h4(names(golem_opts)[x]),
-              ),
+              class = "centertime",
+              # f7Col(
+              #   width = 2,
+              #   align = "left",
+              #   h4(names(golem_opts)[x]),
+              # ),
               f7Col(
                 align = "center",
+                class = "centertime",
                 f7Stepper(
                   inputId = ns(paste0("time_", names(golem_opts)[x])),
                   label = "",
