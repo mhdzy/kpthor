@@ -7,18 +7,20 @@
 #' @noRd
 #'
 #' @importFrom shiny NS tagList uiOutput column
-#' @importFrom shinyMobile f7Button
+#' @importFrom shinyMobile f7Button f7Col
 mod_settings_ui <- function(id) {
   ns <- NS(id)
   tagList(
     uiOutput(ns("swipe")),
-    column(
-      width = 10,
-      f7Button(
-        inputId = ns("confirm"),
-        label = "confirm",
-        color = "blue",
-        fill = TRUE
+    f7Row(
+      f7Col(
+        width = 10,
+        f7Button(
+          inputId = ns("confirm"),
+          label = "confirm",
+          color = "blue",
+          fill = TRUE
+        )
       )
     )
   )
@@ -65,7 +67,7 @@ mod_settings_server <- function(id, appdata, appdate) {
     output$swipe <- renderUI({
       f7Picker(
         inputId = ns("picker"),
-        label = "pick event to delete",
+        label = "Delete Event",
         placeholder = "walk for 30 at 7:15",
         choices = deletion_choices()
       )

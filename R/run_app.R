@@ -39,7 +39,7 @@ run_app <- function(
       timerq = ensure_queue("timerq", db = "db/timerq"),
       time_vars = list(
         hour   = uvars(0L, 24L, 1L, lubridate::hour,   "gray"),
-        minute = uvars(0L, 60L, 1L, lubridate::minute, "gray")
+        minute = uvars(0L, 60L, 5L, lubridate::minute, "gray")
       ),
       actions = list(
         walk  = avars("walk",  "start walk",  "end walk"),
