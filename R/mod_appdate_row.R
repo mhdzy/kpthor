@@ -44,6 +44,7 @@ mod_appdate_row_ui <- function(id) {
                   #label = paste0("* time (", names(golem_opts)[x], ") *"),
                   min = golem_opts[[x]]$min,
                   max = golem_opts[[x]]$max,
+                  step = golem_opts[[x]]$step,
                   value = golem_opts[[x]]$value(Sys.time()),
                   color = golem_opts[[x]]$color,
                   #size = "small",
