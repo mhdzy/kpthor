@@ -13,6 +13,9 @@ mod_monitor_ui <- function(id) {
   ns <- NS(id)
 
   tagList(
+
+    br(),
+
     f7Row(
       tags$style(
         ".card-expandable {
@@ -52,21 +55,23 @@ mod_monitor_ui <- function(id) {
 #' @noRd
 #'
 #' @importFrom dplyr filter group_by mutate n select summarise
+#' @importFrom lubridate date
 #' @importFrom ggplot2 aes ggplot geom_point
+#' @importFrom magrittr %>%
 #' @importFrom plotly ggplotly renderPlotly
-#' @importFrom shiny moduleServer
+#' @importFrom shiny moduleServer renderImage
 #'
-mod_monitor_server <- function(id, appdata, datetime) {
+mod_monitor_server <- function(id, appdata, appdate) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
 
     # how to access (this) server's vars:
     # appdata$data()
-    # datetime$date()
+    # appdate$date()
 
     today_data <- reactive({
-      appdata$data() |>
-        filter(date == datetime$date())
+      appdata$data() %>%
+        filter(lubridate::date(datetime) == appdate$date())
     })
 
     # tod_data
@@ -77,18 +82,17 @@ mod_monitor_server <- function(id, appdata, datetime) {
     #
     tod_data <- function(act) {
       return(
-        today_data() |>
-          mutate(datetime = as.POSIXct(paste0(date, " ", time, ":", minute))) |>
-          filter(action %in% act) |>
-          group_by(datetime, action) |>
+        today_data() %>%
+          filter(action %in% act) %>%
+          group_by(datetime, action) %>%
           summarise(total = sum(as.numeric(value)))
       )
     }
 
     # transforms the daily (selected) data to totals & counts by action
     total_count_data <- reactive({
-      today_data() |>
-        group_by(action) |>
+      today_data() %>%
+        group_by(action) %>%
         summarise(
           total = sum(as.numeric(value)),
           count = n()
@@ -103,7 +107,7 @@ mod_monitor_server <- function(id, appdata, datetime) {
     # @param type A column to return from the data.
     #
     tc_data <- function(act, type) {
-      return((total_count_data() |> filter(action %in% act))[[type]])
+      return((total_count_data() %>% filter(action %in% act))[[type]])
     }
 
     # html_format
@@ -119,10 +123,10 @@ mod_monitor_server <- function(id, appdata, datetime) {
 
     plotly_format <- function(dat) {
       (
-        dat |>
+        dat %>%
           ggplot(aes(x = datetime, y = total, color = action)) +
           geom_point()
-      ) |>
+      ) %>%
         ggplotly()
     }
 
@@ -151,17 +155,17 @@ mod_monitor_server <- function(id, appdata, datetime) {
     })
 
     output$food_content <- renderPlotly({
-      tod_data(c("food", "water")) |>
+      tod_data(c("food", "water")) %>%
         plotly_format()
     })
 
     output$play_content <- renderPlotly({
-      tod_data(c("out", "play", "walk")) |>
+      tod_data(c("out", "play", "walk")) %>%
         plotly_format()
     })
 
     output$poop_content <- renderPlotly({
-      tod_data(c("pee", "poop")) |>
+      tod_data(c("pee", "poop")) %>%
         plotly_format()
     })
 
