@@ -213,10 +213,9 @@ mod_button_action_server <- function(id, appdata, appdate) {
         df <-
           data.frame(
             pet = get_golem_options("pet"),
-            datetime = lubridate::force_tz(
+            datetime = lubridate::with_tz(lubridate::force_tz(
               lubridate::ymd_hms(paste0(appdate$date(), " ", appdate$hour(), ":", appdate$minute(), ":", "00")),
-              "America/New_York"
-            ),
+              "EST5EDT"), "UTC"),
             action = mode,
             value = timer_time
           ) %>%

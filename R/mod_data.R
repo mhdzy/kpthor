@@ -52,7 +52,7 @@ mod_data_server <- function(id, refresh_pull, refresh_tabs) {
       dat_latest <- get_golem_options("dbi")$query_self_param_clear(
         get_golem_options("schema"), get_golem_options("table")
       ) %>%
-        dplyr::mutate(datetime = lubridate::force_tz(datetime, "America/New_York"))
+        dplyr::mutate(datetime = lubridate::with_tz(datetime, "EST5EDT"))
 
       # only update data object if we get new info
       if (!identical(dat_cache(), dat_latest)) {

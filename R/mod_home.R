@@ -149,10 +149,13 @@ mod_home_server <- function(id, appdata, appdate) {
           dplyr::summarise(sum = sum(value)) |>
           dplyr::pull(sum)
 
+        val <- dtot/hgs[['daily_max']] * 100
+        valtext <- paste(dtot, hgs[['units']])
+
         updateF7Gauge(
           id = ns(paste0(gauge, "-gauge")),
-          value = dtot/hgs[['daily_max']] * 100,
-          valueText = paste(dtot, hgs[['units']])
+          value = val,
+          valueText = valtext
         )
 
       }
