@@ -70,18 +70,21 @@ mod_home_ui <- function(id) {
           value = 0,
 
           borderBgColor = "#d2d2d2", # gray (dark 1, lightest)
-          borderColor = "#ffcd9c", # light orange
+          borderColor = "#ffc083", # light orange
           borderWidth = 10,
-          valueTextColor = "#ffb469",
+          valueTextColor = "#ff9937",
           valueFontSize = 12,
           valueFontWeight = 12,
           labelText = "play",
-          labelTextColor = "#ff9a36", # dark orange
+          labelTextColor = "#ff7f04", # dark orange
           labelFontSize = 12,
           labelFontWeight = 12
         )
       )
-    )
+    ),
+
+    #mod_predictions_ui("predictions"),
+    tableOutput(ns("tbl"))
 
   )
 }
@@ -98,6 +101,27 @@ mod_home_ui <- function(id) {
 mod_home_server <- function(id, appdata, appdate) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
+
+    datetime_now <- reactive({
+      force_tz(
+        ymd_hms(paste0(appdate$date(), " ", appdate$hour(), ":", appdate$minute(), ":", "00")),
+        "EST5EDT")
+    })
+    browser()
+    predictions <- eventReactive(c(appdata$data(), appdate$date(), appdate$hour(), appdate$minute()), {
+      dat <- dbMigrate(df = isolate(appdata$data()))
+      vals <- dbCluster(isolate(datetime_now()), dat)
+      predictions <- upcomingEvents(isolate(datetime_now()), vals$eventdf, vals$clusterdf)
+      return(predictions)
+    })
+
+    output$tbl <- renderTable({
+      log_trace("[{id}] predicting...")
+      print(predictions())
+      predictions()
+    })
+
+    #mod_predictions_server("predictions", appdata, appdate)
 
     todaydf <- reactive({
       # no need to wrap in a 'change detector' as appdata() is only updated
@@ -143,9 +167,17 @@ mod_home_server <- function(id, appdata, appdate) {
       # operates in scope of the mod_home module
       updateGauge <- function(gauge) {
 
+        sec_to_min <- c(
+          "out",
+          "play",
+          "walk",
+          "sleep"
+        )
+
         hgs <- home_gauge_struct[[gauge]]
         dtot <- todaydf() %>%
           dplyr::filter(action %in% hgs[['actions']]) %>%
+          dplyr::mutate(value = dplyr::if_else(action %in% sec_to_min, value/60, value)) %>%
           dplyr::summarise(sum = sum(value)) |>
           dplyr::pull(sum)
 

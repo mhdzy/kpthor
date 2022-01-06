@@ -63,12 +63,15 @@ golem::add_module( name = "monitor" )
 golem::add_module( name = "table" )
 golem::add_module( name = "home" )
 
+golem::add_module( name = "predictions" )
 golem::add_module( name = "settings" )
 
 ## Add helper functions ----
 ## Creates fct_* and utils_*
 golem::add_fct( "db" )
 
+golem::add_utils( "db-migrate" )
+golem::add_utils( "db-cluster" )
 golem::add_utils( "vars" )
 
 ## External resources
