@@ -110,7 +110,7 @@ if (FALSE) {
 
       if (PUSH_TO_DB) {
         rows_deleted <- dbi_insert$execute("delete from kpthor.allevents;")
-        dbi_insert$append_self(pushdf)
+        dbi_insert$append_self(df)
       }
     }
   }
