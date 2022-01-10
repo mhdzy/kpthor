@@ -17,6 +17,7 @@ mod_monitor_ui <- function(id) {
     br(),
 
     f7Row(
+      style = "margin: 20px",
       tags$style(
         ".card-expandable {
           height: 150px;
@@ -54,7 +55,7 @@ mod_monitor_ui <- function(id) {
 #'
 #' @noRd
 #'
-#' @importFrom dplyr filter group_by mutate n select summarise
+#' @importFrom dplyr filter group_by mutate n select summarise pull
 #' @importFrom lubridate date
 #' @importFrom ggplot2 aes ggplot geom_point
 #' @importFrom magrittr %>%
@@ -74,6 +75,16 @@ mod_monitor_server <- function(id, appdata, appdate) {
         filter(lubridate::date(datetime) == appdate$date())
     })
 
+    # transforms the daily (selected) data to totals & counts by action
+    total_count_data <- reactive({
+      today_data() %>%
+        group_by(action) %>%
+        summarise(
+          value = sum(as.numeric(value)),
+          count = n()
+        )
+    })
+
     # tod_data
     #
     # Get the daily (selected via input date) raw data.
@@ -85,19 +96,9 @@ mod_monitor_server <- function(id, appdata, appdate) {
         today_data() %>%
           filter(action %in% act) %>%
           group_by(datetime, action) %>%
-          summarise(total = sum(as.numeric(value)))
+          summarise(value = sum(as.numeric(value)))
       )
     }
-
-    # transforms the daily (selected) data to totals & counts by action
-    total_count_data <- reactive({
-      today_data() %>%
-        group_by(action) %>%
-        summarise(
-          total = sum(as.numeric(value)),
-          count = n()
-        )
-    })
 
     # tc_data
     #
@@ -107,7 +108,8 @@ mod_monitor_server <- function(id, appdata, appdate) {
     # @param type A column to return from the data.
     #
     tc_data <- function(act, type) {
-      return((total_count_data() %>% filter(action %in% act))[[type]])
+      if (!nrow(total_count_data())) return(0)
+      return((total_count_data() %>% filter(action %in% act)) %>% pull(value))
     }
 
     # html_format
@@ -124,33 +126,52 @@ mod_monitor_server <- function(id, appdata, appdate) {
     plotly_format <- function(dat) {
       (
         dat %>%
-          ggplot(aes(x = datetime, y = total, color = action)) +
+          ggplot(aes(x = datetime, y = value, color = action)) +
           geom_point()
       ) %>%
         ggplotly()
     }
 
     output$food <- renderUI({
-      html_format(
-        "%s cups food<br>%s cups water",
-        tc_data("food", "total"),
-        tc_data("water", "total")
+      tagList(
+        html_format(
+          "%s cups food",
+          tc_data("food", "value")
+        ),
+        br(),
+        html_format(
+          "%s cups water",
+          tc_data("water", "value")
+        )
       )
     })
 
     output$play <- renderUI({
-      html_format(
-        "played for %s mins<br>walked for %s mins",
-        tc_data(c("play", "out"), "total"),
-        tc_data("walk", "total")
+      tagList(
+        html_format(
+          "outside for %s hours",
+          # need sum because we pass 2 possible values
+          round(sum(tc_data(c("play", "out"), "value")/3600), 1)
+        ),
+        br(),
+        html_format(
+          "walked for %s hours",
+          round(tc_data("walk", "value")/3600, 1)
+        )
       )
     })
 
     output$poop <- renderUI({
-      html_format(
-        "peed %s times<br>pooped %s times",
-        tc_data("pee", "count"),
-        tc_data("poop", "count")
+      tagList(
+        html_format(
+          "peed %s times",
+          tc_data("pee", "count")
+        ),
+        br(),
+        html_format(
+          "pooped %s times",
+          tc_data("poop", "count")
+        )
       )
     })
 

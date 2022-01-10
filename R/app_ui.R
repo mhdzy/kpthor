@@ -17,7 +17,7 @@ app_ui <- function(request) {
     f7Page(
       title = "kpthor",
       preloader = TRUE,
-      allowPWA = TRUE,
+      allowPWA = FALSE,
       loading_duration = 2L,
 
       f7TabLayout(
@@ -39,7 +39,8 @@ app_ui <- function(request) {
             # static button inputs
             mod_appdate_row_ui("time_vars"),
             mod_button_action_ui("actions"),
-            br(), mod_button_input_ui("inputs"),
+            mod_button_input_ui("inputs"),
+            mod_predlist_ui("input_preds"),
 
             # popup inputs
             mod_popup_box_ui("food_vars"),

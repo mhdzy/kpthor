@@ -51,6 +51,36 @@ run_app <- function(
         play = c("play", "play", "teal"),
         poop = c("poop", "poop", "deeporange")
       ),
+      eventPrefix = list(
+        "food" = "ate",
+        "out" = "went",
+        "pee" = "went",
+        "play" = "went out to",
+        "poop" = "went",
+        "sleep" = "went to",
+        "walk" = "went on a",
+        "water" = "drank"
+      ),
+      predPrefix = list(
+        "food" = "eat",
+        "out" = "go",
+        "pee" = "go",
+        "play" = "go",
+        "poop" = "go",
+        "sleep" = "go to",
+        "walk" = "go on a",
+        "water" = "drink"
+      ),
+      eventIcons = list(
+        "food" = "poultry_leg",
+        "out" = "cloud_sun",
+        "pee" = "umbrella",
+        "play" = "paw",
+        "poop" = "recordingtape",
+        "sleep" = "zzz",
+        "walk" = "dog",
+        "water" = "drop"
+      ),
       food_vars = list(
         food  = uvars(0L, 3L, 0.5, 1.5, "teal"),
         water = uvars(0L, 5L, 0.5, 1.0, "lightblue")

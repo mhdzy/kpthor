@@ -25,12 +25,16 @@ app_server <- function( input, output, session ) {
   action_row <- mod_button_action_server("actions", appdata, appdate)
   input_row <- mod_button_input_server("inputs")
 
+  # event predictions, cluster based std. deviation ranges
+  predictions <- mod_predictions_server("predictions", appdata, appdate)
+  mod_predlist_server("input_preds", appdata, appdate, predictions)
+
   mod_popup_box_server("food_vars", input_row$food, appdata, appdate)
   mod_popup_box_server("play_vars", input_row$play, appdata, appdate)
   mod_popup_box_server("poop_vars", input_row$poop, appdata, appdate)
 
   mod_monitor_server("monitor", appdata, appdate)
-  mod_home_server("home", appdata, appdate)
+  mod_home_server("home", appdata, appdate, predictions)
   mod_table_server("table", appdata, appdate)
   mod_settings_server("settings", appdata, appdate)
 }

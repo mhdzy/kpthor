@@ -11,7 +11,10 @@
 mod_settings_ui <- function(id) {
   ns <- NS(id)
   tagList(
-    uiOutput(ns("swipe")),
+    uiOutput(ns("user")),
+    uiOutput(ns("pwd")),
+    uiOutput(ns("pets")),
+    uiOutput(ns("delete")),
     f7Row(
       f7Col(
         width = 10,
@@ -33,18 +36,14 @@ mod_settings_ui <- function(id) {
 #' @importFrom logger log_trace log_warn
 #' @importFrom lubridate date
 #' @importFrom shiny moduleServer reactive renderUI observeEvent
-#' @importFrom shinyMobile f7Picker f7SwipeoutItem f7Dialog
+#' @importFrom shinyMobile f7Picker f7SwipeoutItem f7Dialog f7Toast
+#' @importFrom shinyMobile f7Text
 #'
 #' @noRd
 #'
 mod_settings_server <- function(id, appdata, appdate) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
-
-    observe({
-      print(input$delete)
-      print(input$modify)
-    })
 
     localdata <- reactive({
       appdata$data() %>%
@@ -64,9 +63,36 @@ mod_settings_server <- function(id, appdata, appdate) {
       paste0(localdata()$action, " for ", localdata()$value, " at ", localdata()$time, ":", localdata()$minute)
     })
 
-    output$swipe <- renderUI({
+    output$user <- renderUI({
+      f7Text(
+        inputId = ns("username"),
+        label = "your username",
+        value = NULL,
+        placeholder = "login to view username"
+      )
+    })
+
+    output$pwd <- renderUI({
+      f7Text(
+        inputId = ns("password"),
+        label = "change your password",
+        value = NULL,
+        placeholder = "x!nG3aefo=24y"
+      )
+    })
+
+    output$pets <- renderUI({
+      f7Text(
+        inputId = ns("petsowned"),
+        label = "your pets",
+        value = c("Kashi"),
+        placeholder = "add some pets!"
+      )
+    })
+
+    output$delete <- renderUI({
       f7Picker(
-        inputId = ns("picker"),
+        inputId = ns("delpicker"),
         label = "Delete Event",
         placeholder = "walk for 30 at 7:15",
         choices = deletion_choices()
@@ -83,7 +109,7 @@ mod_settings_server <- function(id, appdata, appdate) {
     })
 
     observeEvent(input$delete_dialog, {
-      row_idx <- which(input$picker == deletion_choices())
+      row_idx <- which(input$delpicker == deletion_choices())
       del_hash <- localdata()[row_idx, ]$hash
       del_conf <- get_golem_options("dbi")$execute(
         paste0(
@@ -94,8 +120,10 @@ mod_settings_server <- function(id, appdata, appdate) {
       )
       if (del_conf) {
         log_trace("[{id}] delete confirmed, deleting")
+        f7Toast(text = "Event deleted successfully!", position = "bottom", closeButtonColor = "green")
       } else {
         log_warn("[{id}] delete failed, warning")
+        f7Toast(text = "Event deletion failed.", position = "bottom", closeButtonColor = "red")
       }
     })
 

@@ -27,6 +27,7 @@ mod_popup_box_ui <- function(id) {
         br(),
         br(),
         f7Row(
+          style = "margin: 20px",
           f7Col(
             f7Button(
               inputId = ns("cancel"),
@@ -61,7 +62,8 @@ mod_popup_box_ui <- function(id) {
 #' @importFrom shiny reactiveValues reactiveValuesToList renderUI
 #' @importFrom shinyjs hide
 #' @importFrom shinyMobile f7Button f7Block f7Col f7Dialog f7Row f7Stepper
-#' @importFrom shinyMobile f7Progress updateF7Progress updateF7Sheet
+#' @importFrom shinyMobile f7Progress updateF7Progress updateF7Sheet f7Toast
+#'
 mod_popup_box_server <- function(id, sheet_trigger, appdata, appdate) {
   stopifnot(is.reactive(sheet_trigger))
   stopifnot(is.list(appdate))
@@ -206,6 +208,7 @@ mod_popup_box_server <- function(id, sheet_trigger, appdata, appdate) {
           } else {
             get_golem_options("dbi")$append(get_golem_options("schema"), get_golem_options("table"), df)
             log_debug("[{id}] appended {nrow(df)} rows to {get_golem_options('schema')}.{get_golem_options('table')}")
+            f7Toast(text = "Event added successfully!", position = "bottom", closeButtonColor = "green")
           }
         } else {
           # idx will have length 0 when all vals are == 0; inform user

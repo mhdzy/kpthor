@@ -14,6 +14,7 @@
 #' @importFrom lubridate with_tz date hour
 #'
 #' @noRd
+#'
 dbCluster <- function(date, eventdf) {
   ev <- eventdf |>
     dplyr::mutate(
@@ -224,7 +225,7 @@ filterCandidateClusters <- function(events, clusters) {
 #' @param eventdf A data frame of events with dates, times, names, and values.
 #' @param clusterdf A data frame of clusters, names, means, and std. deviations.
 #'
-#' @importFrom dplyr filter
+#' @importFrom dplyr filter anti_join
 #'
 #' @noRd
 upcomingEvents <- function(date, eventdf, clusterdf) {
@@ -247,7 +248,7 @@ upcomingEvents <- function(date, eventdf, clusterdf) {
   if (!nrow(re))
     return(ca)
 
-  return(setdiff(ca, re))
+  return(anti_join(ca, re))
 }
 
 #' nextEvents

@@ -52,6 +52,7 @@ mod_button_action_server <- function(id, appdata, appdate) {
     ## o timer ----
     observe({
       invalidateLater(1000)
+      #log_trace("[{id}] observing timer stuff...")
       isolate({
         timerq <- get_golem_options("timerq")
         if (!is_empty(timerq)) {
@@ -99,6 +100,7 @@ mod_button_action_server <- function(id, appdata, appdate) {
           # clear everybody out
           active_timer_mode("")
           active_timer_time(0)
+          #log_warn("we are updating buttons")
           lapply(names(action_struct), function(x) {
             updateF7Button(
               inputId = action_struct[[x]][['name']],
@@ -120,9 +122,10 @@ mod_button_action_server <- function(id, appdata, appdate) {
     ## o$ timer ----
     output$timer <- renderUI({
       f7Row(
+        class = "row-with-margin-reduced",
         lapply(names(action_struct), function(x) {
           f7Col(
-            style = "text-align: center; padding-bottom: 20px;",
+            style = "text-align: center;",
             HTML(ifelse(
               identical(x, active_timer_mode()),
               paste0("<b>", active_timer_nice(), "</b>"),
@@ -136,6 +139,7 @@ mod_button_action_server <- function(id, appdata, appdate) {
     ## o$ row ----
     output$row <- renderUI({
       f7Row(
+        class = "row-with-margin-reduced",
         lapply(action_struct, function(x) {
           f7Col(
             f7Button(
@@ -244,6 +248,7 @@ mod_button_action_server <- function(id, appdata, appdate) {
         } else {
           get_golem_options("dbi")$append(get_golem_options("schema"), get_golem_options("table"), df)
           log_debug("[{id}] appended ", nrow(df), " rows to {get_golem_options('schema')}.{get_golem_options('table')}")
+          f7Toast(text = "Event added successfully!", position = "bottom", closeButtonColor = "green")
         }
 
         # remove the active timer mode from the queue to "stop" the timer

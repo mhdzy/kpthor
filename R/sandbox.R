@@ -37,7 +37,7 @@ if (FALSE) {
 
   LOAD = TRUE
   MIGRATE = TRUE
-  PUSH_TO_DB = FALSE
+  PUSH_TO_DB = TRUE
   PREPDF = TRUE
   PLOTS_GENERAL = FALSE
   HISTOGRAM = FALSE
@@ -561,7 +561,7 @@ if (FALSE) {
           dat <- fe[i, ]
 
           p <- p +
-            #geom_hline(yintercept = dat$time, linetype = "dashed", color = colormap[[dat$action]], size = 0.5) +
+            geom_hline(yintercept = dat$time, linetype = "dashed", color = colormap[[dat$action]], size = 0.5) +
             geom_vline(xintercept = ((dat$time - 6) * 60)/15, linetype = "dashed", color = colormap[[dat$action]], size = 0.5)
         }
         p <- p + ggtitle("upcoming events vs. actual events")

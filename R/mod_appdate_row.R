@@ -4,16 +4,17 @@
 #'
 #' @param id,input,output,session Internal parameters for {shiny}.
 #'
-#' @noRd
-#'
 #' @importFrom lubridate hour minute today
 #' @importFrom shiny NS tagList h5
 #' @importFrom shinyMobile f7Row f7Col f7DatePicker f7Slider f7Icon f7Stepper
+#'
+#' @noRd
 mod_appdate_row_ui <- function(id) {
   ns <- NS(id)
 
   tagList(
     f7Row(
+      class = "row-top-margin-reduced",
       f7Col(
         f7DatePicker(
           inputId = ns("date"),

@@ -14,8 +14,7 @@ mod_home_ui <- function(id) {
     br(),
 
     f7Row(
-      column(
-        12,
+      f7Col(
         align = "center",
         imageOutput(ns("photo"), inline = TRUE)
       )
@@ -83,9 +82,14 @@ mod_home_ui <- function(id) {
       )
     ),
 
-    #mod_predictions_ui("predictions"),
-    tableOutput(ns("tbl"))
+    br(),
 
+    f7Row(
+      f7Col(
+        align = "center",
+        uiOutput(ns("historylist"))
+      )
+    )
   )
 }
 
@@ -93,35 +97,21 @@ mod_home_ui <- function(id) {
 #'
 #' @importFrom dplyr filter select arrange desc
 #' @importFrom golem get_golem_options
+#' @importFrom hms as_hms hms
 #' @importFrom logger log_trace log_warn
+#' @importFrom lubridate hour minute
 #' @importFrom shiny moduleServer reactive renderUI observeEvent
 #' @importFrom shinyMobile f7Picker f7SwipeoutItem f7Dialog f7Gauge updateF7Gauge
+#' @importFrom shinyMobile f7List f7ListItem
 #'
 #' @noRd
-mod_home_server <- function(id, appdata, appdate) {
+mod_home_server <- function(id, appdata, appdate, predictions) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
 
-    datetime_now <- reactive({
-      force_tz(
-        ymd_hms(paste0(appdate$date(), " ", appdate$hour(), ":", appdate$minute(), ":", "00")),
-        "EST5EDT")
+    sortedhistory <- reactive({
+      predictions$dailyhistory() |> arrange(desc(time))
     })
-    browser()
-    predictions <- eventReactive(c(appdata$data(), appdate$date(), appdate$hour(), appdate$minute()), {
-      dat <- dbMigrate(df = isolate(appdata$data()))
-      vals <- dbCluster(isolate(datetime_now()), dat)
-      predictions <- upcomingEvents(isolate(datetime_now()), vals$eventdf, vals$clusterdf)
-      return(predictions)
-    })
-
-    output$tbl <- renderTable({
-      log_trace("[{id}] predicting...")
-      print(predictions())
-      predictions()
-    })
-
-    #mod_predictions_server("predictions", appdata, appdate)
 
     todaydf <- reactive({
       # no need to wrap in a 'change detector' as appdata() is only updated
@@ -177,7 +167,7 @@ mod_home_server <- function(id, appdata, appdate) {
         hgs <- home_gauge_struct[[gauge]]
         dtot <- todaydf() %>%
           dplyr::filter(action %in% hgs[['actions']]) %>%
-          dplyr::mutate(value = dplyr::if_else(action %in% sec_to_min, value/60, value)) %>%
+          dplyr::mutate(value = dplyr::if_else(action %in% sec_to_min, round(value/60, 0), value)) %>%
           dplyr::summarise(sum = sum(value)) |>
           dplyr::pull(sum)
 
@@ -194,6 +184,46 @@ mod_home_server <- function(id, appdata, appdate) {
 
       # apply updates
       lapply(names(home_gauge_struct), updateGauge)
+    })
+
+    output$historylist <- renderUI({
+      log_trace("[{id}] rendering historylist")
+
+      if (!nrow(sortedhistory())) {
+        return(
+          f7List(
+            inset = TRUE,
+            mode = "media",
+            f7ListItem(
+              header = "",
+              footer = "please add an event",
+              "there are no event records for today",
+              media = NULL,
+              right = NULL
+            )
+          )
+        )
+      }
+
+      f7List(
+        inset = TRUE,
+        lapply(
+          seq(nrow(sortedhistory())),
+          function(x) {
+
+            tmp <- sortedhistory()[x, ]
+
+            f7ListItem(
+              header = paste(get_golem_options("pet"), "..."),
+              footer = NULL,
+              # prefixes make the labels more natural: 'walk' -> 'go on a walk', etc.
+              paste(get_golem_options("eventPrefix")[[tmp$action]], tmp$action),
+              media = f7Icon(get_golem_options("eventIcons")[[tmp$action]]),
+              right = astime(isolate(tmp$time))
+            )
+          }
+        )
+      )
     })
 
   })
