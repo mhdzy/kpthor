@@ -33,24 +33,34 @@ mod_predictions_server <- function(id, appdata, appdate) {
       )
     })
 
+    clusters_now <- reactive({
+      log_trace("[{id}] recalculating clusters")
+      dbCluster(datetime_now(), appdata$data())
+    })
+
     # predictions are datetime sensitive, hence why we take a dependence
     # on all coponents of appdate. we also want to re-run predictions when
     # new data is entered or updated.
     predictions <- eventReactive(c(appdata$data(), datetime_now()), {
-      dat <- dbMigrate(df = isolate(appdata$data()))
-      #dat <- dbMigrate(push_to_db = FALSE)
-      vals <- dbCluster(isolate(datetime_now()), dat)
-      predictions <- upcomingEvents(isolate(datetime_now()), vals$eventdf, vals$clusterdf)
+      log_trace("[{id}] recalculating predictions")
+
+      vals <- isolate(clusters_now())
+      date <- isolate(datetime_now())
+      predictions <- upcomingEvents(date, vals$eventdf, vals$clusterdf)
+
       return(predictions)
     })
 
     # daily history does *not* depend on the time, and we should want to display
     # the full daily history even if we are going back in time
-    dailyhistory <- eventReactive(appdata$data(), {
-      dat <- dbMigrate(df = isolate(appdata$data()))
-      vals <- dbCluster(isolate(datetime_now()), dat)
-      res <- filterEvents(isolate(datetime_now()), vals$eventdf)
-      return(res)
+    dailyhistory <- eventReactive(c(appdata$data(), appdate$date()), {
+      log_trace("[{id}] recalculating daily history")
+
+      vals <- isolate(clusters_now())
+      date <- isolate(datetime_now())
+      hist <- filterEvents(date, vals$eventdf)
+
+      return(hist)
     })
 
     return(

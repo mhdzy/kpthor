@@ -60,7 +60,12 @@ mod_settings_server <- function(id, appdata, appdate) {
     })
 
     deletion_choices <- reactive({
-      paste0(localdata()$action, " for ", localdata()$value, " at ", localdata()$time, ":", localdata()$minute)
+      if (!nrow(localdata())) return("")
+      paste0(
+        localdata()$action,
+        " for ", localdata()$value,
+        " at ", uapply(as.numeric(as_hms(localdata()$datetime))/3600, astime)
+      )
     })
 
     output$user <- renderUI({

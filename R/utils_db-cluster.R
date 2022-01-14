@@ -231,10 +231,7 @@ filterCandidateClusters <- function(events, clusters) {
 upcomingEvents <- function(date, eventdf, clusterdf) {
   now_hr <- as.numeric(hms::as_hms(date))/3600 # in hours
 
-  ev <- filterEvents(date, eventdf) |>
-    dplyr::filter(
-      time < now_hr
-    )
+  ev <- filterEvents(date, eventdf)
 
   ca <- candidateClusters(clusterdf) |>
     dplyr::filter(
