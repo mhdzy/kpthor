@@ -22,7 +22,7 @@ mod_button_action_ui <- function(id) {
 #'
 #' @importFrom dplyr if_else
 #' @importFrom liteq ack consume is_empty list_messages list_failed_messages requeue_failed_messages publish try_consume
-#' @importFrom logger log_trace
+#' @importFrom logger log_info log_trace log_warn
 #' @importFrom lubridate seconds_to_period hour minute second seconds
 #' @importFrom magrittr %>%
 #' @importFrom shiny moduleServer tagList observe observeEvent reactive
@@ -36,6 +36,10 @@ mod_button_action_server <- function(id, appdata, appdate) {
     # names are used to define button inputs
     # items are lists of visual parameters; labels and colors
     action_struct <- get_golem_options(id)
+
+    # safety check variable to ensure app does not refresh inactive timers
+    # continuously. needs to be TRUE on init to color buttons blue
+    needs_refresh <- reactiveVal(TRUE)
 
     # active_timer_* are reactive values used to administer the timer mechanism
     active_timer_mode <- reactiveVal("")
@@ -51,28 +55,34 @@ mod_button_action_server <- function(id, appdata, appdate) {
 
     ## o timer ----
     observe({
-      invalidateLater(1000)
-      #log_trace("[{id}] observing timer stuff...")
+      invalidateLater(2000)
+      log_trace("[{id}] observing timer stuff...")
       isolate({
         timerq <- get_golem_options("timerq")
+
         if (!is_empty(timerq)) {
+          log_trace("[{id}] queue not empty, work to be done")
           msg <- liteq::try_consume(timerq)
 
           if (is.null(msg)) {
             # need to fix queue and try again
             if (nrow(liteq::list_failed_messages(timerq))) {
+              log_warn("[{id}] need to requeue a failed message")
               liteq::requeue_failed_messages(timerq)
               msg <- liteq::try_consume(timerq)
             } else {
+              log_fatal("[{id}] liteq queue seems corrupted, check db")
               stop("non-empty liteq queue 'timerq' with no FAILED messages is returning NULL")
             }
           }
 
           # republish fetched message to the queue before acknowledging old msg
           liteq::publish(timerq, title = msg$title, message = msg$message)
+          log_trace("[{id}] message published")
 
           # acknowledge "working" message from queue for safe removal of object
           liteq::ack(msg)
+          log_trace("[{id}] message acknowledged")
 
           # if msg contains a timer we aren't tracking, update our mode
           if (active_timer_mode() != msg$title) active_timer_mode(msg$title)
@@ -87,6 +97,8 @@ mod_button_action_server <- function(id, appdata, appdate) {
             label = action_struct[[active_timer_mode()]][['end_label']],
             color = action_struct[[active_timer_mode()]][['end_color']]
           )
+          log_trace("[{id}] active timer set")
+
           # TODO: make this not brute-forced
           # clears out non-active timer rows to blue
           lapply(names(action_struct)[!(names(action_struct) %in% active_timer_mode())], function(x) {
@@ -96,18 +108,29 @@ mod_button_action_server <- function(id, appdata, appdate) {
               color = action_struct[[x]][['start_color']]
             )
           })
+          log_trace("[{id}] inactive timers reset")
+
+          # inform the timer clearing section to clear the timers, bypass stopper
+          needs_refresh(TRUE)
         } else {
           # clear everybody out
+          # only update DOM if it actually needs refreshing
+          if (needs_refresh()) {
           active_timer_mode("")
           active_timer_time(0)
-          #log_warn("we are updating buttons")
-          lapply(names(action_struct), function(x) {
-            updateF7Button(
-              inputId = action_struct[[x]][['name']],
-              label = action_struct[[x]][['start_label']],
-              color = action_struct[[x]][['start_color']]
-            )
-          })
+
+            log_warn("[{id}] we are refreshing buttons")
+            lapply(names(action_struct), function(x) {
+              updateF7Button(
+                inputId = action_struct[[x]][['name']],
+                label = action_struct[[x]][['start_label']],
+                color = action_struct[[x]][['start_color']]
+              )
+            })
+            needs_refresh(FALSE)
+          } else {
+            log_trace("[{id}] refresh avoided")
+          }
         }
       })
     })
@@ -202,14 +225,14 @@ mod_button_action_server <- function(id, appdata, appdate) {
       timerq <- get_golem_options("timerq")
 
       type <-
-      if (identical("", active_timer_mode())) {
-        "new"
-      } else if (identical(button_pressed(), active_timer_mode())) {
-        "same"
-      } else {
-        # !identical(button_pressed(), active_timer_mode())
-        "swap"
-      }
+        if (identical("", active_timer_mode())) {
+          "new"
+        } else if (identical(button_pressed(), active_timer_mode())) {
+          "same"
+        } else {
+          # !identical(button_pressed(), active_timer_mode())
+          "swap"
+        }
 
       if (type == "same" || type == "swap") {
         mode <- isolate(active_timer_mode())

@@ -28,6 +28,7 @@ mod_navbar_server <- function(id) {
     ns <- session$ns
 
     output$message <- renderUI({
+      log_trace("[{id}] render navbar message")
       local <- hour(Sys.time())
       greeting <-
         if (identical("development", Sys.getenv("GOLEM_CONFIG_ACTIVE"))) {

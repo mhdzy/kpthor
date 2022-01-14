@@ -133,6 +133,7 @@ mod_monitor_server <- function(id, appdata, appdate) {
     }
 
     output$food <- renderUI({
+      log_trace("[{id}] render food container label")
       tagList(
         html_format(
           "%s cups food",
@@ -147,6 +148,7 @@ mod_monitor_server <- function(id, appdata, appdate) {
     })
 
     output$play <- renderUI({
+      log_trace("[{id}] render play container label")
       tagList(
         html_format(
           "outside for %s hours",
@@ -162,6 +164,7 @@ mod_monitor_server <- function(id, appdata, appdate) {
     })
 
     output$poop <- renderUI({
+      log_trace("[{id}] render poop container label")
       tagList(
         html_format(
           "peed %s times",
@@ -176,16 +179,19 @@ mod_monitor_server <- function(id, appdata, appdate) {
     })
 
     output$food_content <- renderPlotly({
+      log_trace("[{id}] render food container plot content")
       tod_data(c("food", "water")) %>%
         plotly_format()
     })
 
     output$play_content <- renderPlotly({
+      log_trace("[{id}] render play container plot content")
       tod_data(c("out", "play", "walk")) %>%
         plotly_format()
     })
 
     output$poop_content <- renderPlotly({
+      log_trace("[{id}] render poop container plot content")
       tod_data(c("pee", "poop")) %>%
         plotly_format()
     })

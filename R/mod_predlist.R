@@ -78,9 +78,3 @@ mod_predlist_server <- function(id, appdata, appdate, predictions) {
 
   })
 }
-
-## To be copied in the UI
-# mod_predlist_ui("predlist_ui_1")
-
-## To be copied in the server
-# mod_predlist_server("predlist_ui_1")

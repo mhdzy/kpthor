@@ -64,6 +64,7 @@ mod_settings_server <- function(id, appdata, appdate) {
     })
 
     output$user <- renderUI({
+      log_trace("[{id}] render username box")
       f7Text(
         inputId = ns("username"),
         label = "your username",
@@ -73,6 +74,7 @@ mod_settings_server <- function(id, appdata, appdate) {
     })
 
     output$pwd <- renderUI({
+      log_trace("[{id}] render password box")
       f7Text(
         inputId = ns("password"),
         label = "change your password",
@@ -82,6 +84,7 @@ mod_settings_server <- function(id, appdata, appdate) {
     })
 
     output$pets <- renderUI({
+      log_trace("[{id}] render pets box")
       f7Text(
         inputId = ns("petsowned"),
         label = "your pets",
@@ -91,6 +94,7 @@ mod_settings_server <- function(id, appdata, appdate) {
     })
 
     output$delete <- renderUI({
+      log_trace("[{id}] render delete box")
       f7Picker(
         inputId = ns("delpicker"),
         label = "Delete Event",
@@ -100,6 +104,7 @@ mod_settings_server <- function(id, appdata, appdate) {
     })
 
     observeEvent(input$confirm, {
+      log_trace("[{id}] render delete confirm button")
       f7Dialog(
         id = ns("delete_dialog"),
         title = "confirm",
@@ -109,6 +114,7 @@ mod_settings_server <- function(id, appdata, appdate) {
     })
 
     observeEvent(input$delete_dialog, {
+      log_trace("[{id}] delete event confirmed, deleting")
       row_idx <- which(input$delpicker == deletion_choices())
       del_hash <- localdata()[row_idx, ]$hash
       del_conf <- get_golem_options("dbi")$execute(

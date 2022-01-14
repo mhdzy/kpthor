@@ -100,6 +100,7 @@ mod_home_ui <- function(id) {
 #' @importFrom hms as_hms hms
 #' @importFrom logger log_trace log_warn
 #' @importFrom lubridate hour minute
+#' @importFrom magrittr %>%
 #' @importFrom shiny moduleServer reactive renderUI observeEvent
 #' @importFrom shinyMobile f7Picker f7SwipeoutItem f7Dialog f7Gauge updateF7Gauge
 #' @importFrom shinyMobile f7List f7ListItem
@@ -110,7 +111,8 @@ mod_home_server <- function(id, appdata, appdate, predictions) {
     ns <- session$ns
 
     sortedhistory <- reactive({
-      predictions$dailyhistory() |> arrange(desc(time))
+      predictions$dailyhistory() %>%
+        arrange(desc(time))
     })
 
     todaydf <- reactive({
@@ -142,6 +144,7 @@ mod_home_server <- function(id, appdata, appdate, predictions) {
     )
 
     output$photo <- renderImage({
+      log_trace("[{id}] updating photo")
       list(
         src = file.path("inst/app/www/favicon.ico"),
         contentType = "image/jpeg",

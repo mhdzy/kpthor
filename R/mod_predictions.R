@@ -18,6 +18,7 @@ mod_predictions_ui <- function(id) {
 #'
 #' @importFrom lubridate force_tz ymd_hms
 #' @importFrom logger log_trace
+#' @importFrom shiny moduleServer reactive eventReactive isolate
 #'
 #' @noRd
 mod_predictions_server <- function(id, appdata, appdate) {
@@ -25,6 +26,7 @@ mod_predictions_server <- function(id, appdata, appdate) {
     ns <- session$ns
 
     datetime_now <- reactive({
+      log_trace("[{id}] recalculating datetime now (internal)")
       force_tz(
         ymd_hms(paste0(appdate$date(), " ", appdate$hour(), ":", appdate$minute(), ":", "00")),
         "EST5EDT"
@@ -59,9 +61,3 @@ mod_predictions_server <- function(id, appdata, appdate) {
     )
   })
 }
-
-## To be copied in the UI
-# mod_predictions_ui("predictions_ui_1")
-
-## To be copied in the server
-# mod_predictions_server("predictions_ui_1")

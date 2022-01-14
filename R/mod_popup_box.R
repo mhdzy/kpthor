@@ -136,13 +136,11 @@ mod_popup_box_server <- function(id, sheet_trigger, appdata, appdate) {
     })
 
     ## oE sheet trigger ----
-    observeEvent(
-      eventExpr = sheet_trigger(),
-      handlerExpr = {
-        # this will toggle on the input sheet
-        updateF7Sheet("sheet")
-        log_trace("[{id}] sheet triggered")
-      }
+    observeEvent(sheet_trigger(), {
+      # this will toggle on the input sheet
+      log_trace("[{id}] sheet (update) triggered")
+      updateF7Sheet("sheet")
+    }
     )
 
     ## oE submit btn ----
