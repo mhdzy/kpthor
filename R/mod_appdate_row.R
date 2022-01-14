@@ -14,7 +14,7 @@ mod_appdate_row_ui <- function(id) {
 
   tagList(
     f7Row(
-      class = "row-top-margin-reduced",
+      class = "margin-t-reduced",
       f7Col(
         f7DatePicker(
           inputId = ns("date"),

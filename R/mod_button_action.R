@@ -121,8 +121,9 @@ mod_button_action_server <- function(id, appdata, appdate) {
 
     ## o$ timer ----
     output$timer <- renderUI({
+      log_trace("[{id}] render timer output row")
       f7Row(
-        class = "row-with-margin-reduced",
+        class = "margin-lr",
         lapply(names(action_struct), function(x) {
           f7Col(
             style = "text-align: center;",
@@ -138,8 +139,9 @@ mod_button_action_server <- function(id, appdata, appdate) {
 
     ## o$ row ----
     output$row <- renderUI({
+      log_trace("[{id}] render timer button row")
       f7Row(
-        class = "row-with-margin-reduced",
+        class = "margin-lr",
         lapply(action_struct, function(x) {
           f7Col(
             f7Button(

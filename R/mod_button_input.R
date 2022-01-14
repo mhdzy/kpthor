@@ -30,8 +30,10 @@ mod_button_input_server <- function(id) {
 
     ## o$ row ----
     output$row <- renderUI({
+      log_trace("[{id}] rendering input buttons")
       f7Row(
-        style = "margin: 20px",
+        class = "margin",
+        #style = "margin: 20px",
         lapply(row_struct, function(x) {
           f7Col(
             f7Button(

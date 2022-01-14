@@ -17,7 +17,7 @@ mod_monitor_ui <- function(id) {
     br(),
 
     f7Row(
-      style = "margin: 20px",
+      class = "margin",
       tags$style(
         ".card-expandable {
           height: 150px;
