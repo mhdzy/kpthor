@@ -181,7 +181,7 @@ mod_popup_box_server <- function(id, sheet_trigger, appdata, appdate) {
           ) %>%
           dplyr::mutate(
             # TODO: ensure units of 'seconds' for time-based inputs
-            value = dplyr::if_else(action %in% min_to_sec, value * 60, value),
+            value = dplyr::if_else(action %in% min_to_sec, value * 60.0, value * 1.0),
             hash = purrr::map_chr(paste0(pet, datetime, action, value), digest::digest, algo = "sha256")
           )
 
