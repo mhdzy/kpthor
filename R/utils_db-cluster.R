@@ -4,6 +4,7 @@
 #'
 #' @param date A datetime object (preferrably from lubridate).
 #' @param eventdf A timestamped data frame of actions & events.
+#' @param raw A boolean value to return raw clusters (non-df list).
 #'
 #' @return The computed clusters for each unique action. Number of centroids per
 #' cluster group (event action name) is auto-detected by the algorithm.
@@ -15,7 +16,7 @@
 #'
 #' @noRd
 #'
-dbCluster <- function(date, eventdf) {
+dbCluster <- function(date, eventdf, raw = FALSE) {
   ev <- eventdf |>
     dplyr::mutate(
       datetime = lubridate::with_tz(datetime, "EST5EDT")
@@ -43,6 +44,8 @@ dbCluster <- function(date, eventdf) {
       )
     })
   names(all_clusters) <- all_events
+
+  if (raw) return(all_clusters)
 
   cl <- dplyr::bind_rows(createClusterEvents(all_clusters))
 

@@ -54,6 +54,7 @@ golem::add_module( name = "navbar" )
 
 golem::add_module( name = "button_action" )
 golem::add_module( name = "button_input" )
+golem::add_module( name = "predlist" )
 
 golem::add_module( name = "appdate_row" )
 golem::add_module( name = "popup_box" )
