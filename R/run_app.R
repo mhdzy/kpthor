@@ -36,7 +36,7 @@ run_app <- function(
         # dsn defined in /etc/odbc.ini
         dsn = get_golem_config("app_dsn")
       ),
-      timerq = ensure_queue("timerq", db = "db/timerq"),
+      timerq = ensure_queue("timerq", db = get_golem_config("app_timer_db")),
       time_vars = list(
         hour   = uvars(0L, 24L, 1L, lubridate::hour,   "gray"),
         minute = uvars(0L, 60L, 5L, lubridate::minute, "gray")

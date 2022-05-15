@@ -133,13 +133,13 @@ mod_home_server <- function(id, appdata, appdate, predictions) {
       ),
       `water` = list(
         units = "cups",
-        daily_max = 5,
+        daily_max = 7,
         actions = c("water")
       ),
       `play` = list(
         units = "mins",
-        daily_max = 90,
-        actions = c("walk", "out", "play")
+        daily_max = 60,
+        actions = c("walk", "play")
       )
     )
 
