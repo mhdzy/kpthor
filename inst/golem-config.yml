@@ -4,7 +4,7 @@ default: &default
   golem_wd: !expr here::here()
   app_dsn: "KPthorSQL"
   app_prod: no
-  app_timer_db: db/timerq
+  app_timer_db: /data/apps/kpthor/db/timerq
 
 development:
   <<: *default

@@ -37,6 +37,7 @@ run_app <- function(
         dsn = get_golem_config("app_dsn")
       ),
       timerq = ensure_queue("timerq", db = get_golem_config("app_timer_db")),
+      timer_interval = 5000L,
       time_vars = list(
         hour   = uvars(0L, 24L, 1L, lubridate::hour,   "gray"),
         minute = uvars(0L, 60L, 5L, lubridate::minute, "gray")

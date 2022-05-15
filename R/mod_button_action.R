@@ -55,7 +55,7 @@ mod_button_action_server <- function(id, appdata, appdate) {
 
     ## o timer ----
     observe({
-      invalidateLater(2000)
+      invalidateLater(get_golem_options("timer_interval"))
       log_trace("[{id}] observing timer stuff...")
       isolate({
         timerq <- get_golem_options("timerq")
