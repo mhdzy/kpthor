@@ -44,7 +44,18 @@ declare_global_variables <- function() {
         "action",
         "hash",
         "total",
-        "value"
+        "value",
+        # candidateClusters
+        "mean",
+        "sd",
+        "type",
+        # dbCluster
+        # dbMigrate
+        # mod_button_action_server : <anonymous>:
+        "datetime",
+        # filterEvents
+        # prevEvents
+        "day"
       )
     )
   )

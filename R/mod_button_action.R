@@ -22,7 +22,7 @@ mod_button_action_ui <- function(id) {
 #'
 #' @importFrom dplyr if_else
 #' @importFrom liteq ack consume is_empty list_messages list_failed_messages requeue_failed_messages publish try_consume
-#' @importFrom logger log_info log_trace log_warn
+#' @importFrom logger log_info log_trace log_warn log_fatal
 #' @importFrom lubridate seconds_to_period hour minute second seconds
 #' @importFrom magrittr %>%
 #' @importFrom shiny moduleServer tagList observe observeEvent reactive
