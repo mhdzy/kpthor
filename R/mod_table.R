@@ -25,13 +25,14 @@ mod_table_ui <- function(id) {
 #' @importFrom logger log_trace log_debug
 #' @importFrom lubridate date
 #' @importFrom magrittr %>%
-#' @importFrom shiny eventReactive invalidateLater renderUI
+#' @importFrom shiny eventReactive invalidateLater renderUI req
 #' @importFrom shinyMobile f7Table
 mod_table_server <- function(id, appdata, appdate) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
 
     localdata <- reactive({
+      req(appdata$data())
       appdata$data() %>%
         filter(
           lubridate::date(datetime) == appdate$date(),

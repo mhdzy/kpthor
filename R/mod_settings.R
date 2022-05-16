@@ -14,18 +14,10 @@ mod_settings_ui <- function(id) {
     uiOutput(ns("user")),
     uiOutput(ns("pwd")),
     uiOutput(ns("pets")),
+    uiOutput(ns("modify")),
+    uiOutput(ns("modify_btn")),
     uiOutput(ns("delete")),
-    f7Row(
-      f7Col(
-        width = 10,
-        f7Button(
-          inputId = ns("confirm"),
-          label = "confirm",
-          color = "blue",
-          fill = TRUE
-        )
-      )
-    )
+    uiOutput(ns("delete_btn"))
   )
 }
 
@@ -35,7 +27,7 @@ mod_settings_ui <- function(id) {
 #' @importFrom golem get_golem_options
 #' @importFrom logger log_trace log_warn
 #' @importFrom lubridate date
-#' @importFrom shiny moduleServer reactive renderUI observeEvent
+#' @importFrom shiny moduleServer reactive renderUI observeEvent req
 #' @importFrom shinyMobile f7Picker f7SwipeoutItem f7Dialog f7Toast
 #' @importFrom shinyMobile f7Text
 #'
@@ -46,6 +38,7 @@ mod_settings_server <- function(id, appdata, appdate) {
     ns <- session$ns
 
     localdata <- reactive({
+      req(appdata$data())
       appdata$data() %>%
         filter(
           lubridate::date(datetime) == appdate$date(),
@@ -59,7 +52,7 @@ mod_settings_server <- function(id, appdata, appdate) {
         )
     })
 
-    deletion_choices <- reactive({
+    event_choices <- reactive({
       if (!nrow(localdata())) return("")
       paste0(
         localdata()$action,
@@ -98,17 +91,69 @@ mod_settings_server <- function(id, appdata, appdate) {
       )
     })
 
+    output$modify <- renderUI({
+      log_trace("[{id}] render modify box")
+      f7Picker(
+        inputId = ns("modpicker"),
+        label = "Modify Event",
+        placeholder = "event for 0 at 00:00",
+        choices = event_choices()
+      )
+    })
+
+    output$modify_btn <- renderUI({
+      f7Row(
+        f7Col(
+          width = 10,
+          f7Button(
+            inputId = ns("modconfirm"),
+            label = "confirm",
+            color = "blue",
+            fill = TRUE
+          )
+        )
+      )
+    })
+
+    observeEvent(input$modconfirm, {
+      log_trace("[{id}] render modify confirm button")
+      f7Dialog(
+        id = ns("modify_dialog"),
+        title = "confirm",
+        text = "please confirm modification",
+        type = "confirm"
+      )
+    })
+
+    observeEvent(input$modify_dialog, {
+      log_trace("[{id}] modify event confirmed, modifying")
+    })
+
     output$delete <- renderUI({
       log_trace("[{id}] render delete box")
       f7Picker(
         inputId = ns("delpicker"),
         label = "Delete Event",
-        placeholder = "walk for 30 at 7:15",
-        choices = deletion_choices()
+        placeholder = "event for 0 at 00:00",
+        choices = event_choices()
       )
     })
 
-    observeEvent(input$confirm, {
+    output$delete_btn <- renderUI({
+      f7Row(
+        f7Col(
+          width = 10,
+          f7Button(
+            inputId = ns("delconfirm"),
+            label = "confirm",
+            color = "blue",
+            fill = TRUE
+          )
+        )
+      )
+    })
+
+    observeEvent(input$delconfirm, {
       log_trace("[{id}] render delete confirm button")
       f7Dialog(
         id = ns("delete_dialog"),

@@ -25,7 +25,7 @@ mod_predlist_ui <- function(id) {
 #' @importFrom golem get_golem_options
 #' @importFrom logger log_trace
 #' @importFrom magrittr %>%
-#' @importFrom shiny moduleServer reactive isolate
+#' @importFrom shiny moduleServer reactive isolate req
 #' @importFrom shinyMobile f7List f7ListItem
 #'
 #' @noRd
@@ -35,6 +35,7 @@ mod_predlist_server <- function(id, appdata, appdate, predictions) {
     ns <- session$ns
 
     sortedpreds <- reactive({
+      req(predictions$predictions())
       predictions$predictions() %>% arrange(desc(time))
     })
 

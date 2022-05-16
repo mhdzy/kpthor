@@ -18,7 +18,7 @@ mod_predictions_ui <- function(id) {
 #'
 #' @importFrom lubridate force_tz ymd_hms
 #' @importFrom logger log_trace
-#' @importFrom shiny moduleServer reactive eventReactive isolate
+#' @importFrom shiny moduleServer reactive eventReactive isolate req
 #'
 #' @noRd
 mod_predictions_server <- function(id, appdata, appdate) {
@@ -35,6 +35,7 @@ mod_predictions_server <- function(id, appdata, appdate) {
 
     clusters_now <- reactive({
       log_trace("[{id}] recalculating clusters")
+      req(appdata$data())
       dbCluster(datetime_now(), appdata$data())
     })
 

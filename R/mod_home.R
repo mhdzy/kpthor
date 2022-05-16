@@ -101,7 +101,7 @@ mod_home_ui <- function(id) {
 #' @importFrom logger log_trace log_warn
 #' @importFrom lubridate hour minute
 #' @importFrom magrittr %>%
-#' @importFrom shiny moduleServer reactive renderUI observeEvent
+#' @importFrom shiny moduleServer reactive renderUI observeEvent req
 #' @importFrom shinyMobile f7Picker f7SwipeoutItem f7Dialog f7Gauge updateF7Gauge
 #' @importFrom shinyMobile f7List f7ListItem
 #'
@@ -119,6 +119,7 @@ mod_home_server <- function(id, appdata, appdate, predictions) {
       # no need to wrap in a 'change detector' as appdata() is only updated
       # if different from previously cached values
       #' @seealso `R/mod_data.R`
+      req(appdata$data())
       appdata$data() %>%
         mutate(date = lubridate::date(datetime)) %>%
         filter(date == appdate$date())
