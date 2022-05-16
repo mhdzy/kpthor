@@ -20,15 +20,15 @@ mod_data_ui <- function(id){
 #'
 #' @importFrom golem get_golem_options
 #' @importFrom logger log_trace
+#' @importFrom promises %...>% %...T>% %...!% future_promise
 #' @importFrom shiny moduleServer reactiveVal observe isolate reactive
 #'
 mod_data_server <- function(id, refresh_pull, refresh_tabs) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
 
-    dat_cache <- reactiveVal(get_golem_options("dbi")$query_self_param_clear(
-      get_golem_options("schema"), get_golem_options("table")
-    ))
+    dat <- NULL
+    dat_cache <- reactiveVal()
     refresh <- reactiveVal(0L)
 
     # no observeEvent because only act on certain conditions
@@ -47,16 +47,28 @@ mod_data_server <- function(id, refresh_pull, refresh_tabs) {
       }
     })
 
-    observeEvent(refresh(), {
-      log_trace("[{id}] df refresh")
-      dat_latest <- get_golem_options("dbi")$query_self_param_clear(
-        get_golem_options("schema"), get_golem_options("table")
-      ) %>%
-        dplyr::mutate(datetime = lubridate::with_tz(datetime, "EST5EDT"))
+    dat_refresh <- eventReactive(refresh(), {
+      log_trace("[{id}] df refresh detected")
+      promises::future_promise({
+        get_golem_options("dbi")$query_self_param_clear(
+          get_golem_options("schema"), get_golem_options("table")
+        )
+      })
+    })
 
+    dat_latest <- eventReactive(dat_refresh(), {
+      log_trace("[{id}] dat_refresh triggered a latest pull")
+      dat <<- environment(dat_refresh()[["then"]])[["private"]][["value"]] %>%
+        dplyr::mutate(datetime = lubridate::with_tz(datetime, "EST5EDT"))
+      dat
+    })
+
+    observeEvent(dat_latest(), {
+      log_trace("[{id}] dat_latest triggered observer")
       # only update data object if we get new info
-      if (!identical(dat_cache(), dat_latest)) {
-        dat_cache(dat_latest)
+      if (!identical(dat_cache(), dat)) {
+        log_trace("[{id}] latest data does not match cached data; updating")
+        dat_cache(dat)
       }
     })
 

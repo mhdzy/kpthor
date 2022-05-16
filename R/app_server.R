@@ -5,14 +5,21 @@
 #'
 #' @noRd
 #'
+#' @importFrom future plan multicore
 #' @importFrom logger log_threshold log_layout layout_glue_colors TRACE
 #' @importFrom shiny reactive
 #'
 app_server <- function( input, output, session ) {
+  renv::settings$ignored.packages("kpthor")
+  future::plan(future::multicore)
+
   log_threshold(TRACE)
   log_layout(layout_glue_colors)
 
-  #session$allowReconnect(TRUE)
+  # enables caching of browser session; opens app to duplicate events. incompatible
+  # with active timers as reconnection will resend all inputs, interfering with
+  # the timer mechanicsms
+  # session$allowReconnect(TRUE)
 
   refresh_pull <- reactive(input$ptr)
   refresh_tabs <- reactive(input$f7_tabs)
