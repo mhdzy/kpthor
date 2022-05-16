@@ -125,6 +125,12 @@ mod_home_server <- function(id, appdata, appdate, predictions) {
     })
 
     # used for programmatic gauge updates
+    sec_to_min <- c(
+      "out",
+      "play",
+      "walk",
+      "sleep"
+    )
     home_gauge_struct <- list(
       `food` = list(
         units = "cups",
@@ -143,6 +149,24 @@ mod_home_server <- function(id, appdata, appdate, predictions) {
       )
     )
 
+    updateGauge <- function(df, time_map, struct = home_gauge_struct, gauge) {
+      hgs <- struct[[gauge]]
+      dtot <- df %>%
+        dplyr::filter(action %in% hgs[['actions']]) %>%
+        dplyr::mutate(value = dplyr::if_else(action %in% time_map, round(value/60, 0), value)) %>%
+        dplyr::summarise(sum = sum(value)) |>
+        dplyr::pull(sum)
+
+      val <- dtot/hgs[['daily_max']] * 100
+      valtext <- paste(dtot, hgs[['units']])
+
+      updateF7Gauge(
+        id = ns(paste0(gauge, "-gauge")),
+        value = val,
+        valueText = valtext
+      )
+    }
+
     output$photo <- renderImage({
       log_trace("[{id}] updating photo")
       list(
@@ -157,36 +181,15 @@ mod_home_server <- function(id, appdata, appdate, predictions) {
     observeEvent(todaydf(), {
       log_trace("[{id}] updating gauge")
 
-      # operates in scope of the mod_home module
-      updateGauge <- function(gauge) {
-
-        sec_to_min <- c(
-          "out",
-          "play",
-          "walk",
-          "sleep"
-        )
-
-        hgs <- home_gauge_struct[[gauge]]
-        dtot <- todaydf() %>%
-          dplyr::filter(action %in% hgs[['actions']]) %>%
-          dplyr::mutate(value = dplyr::if_else(action %in% sec_to_min, round(value/60, 0), value)) %>%
-          dplyr::summarise(sum = sum(value)) |>
-          dplyr::pull(sum)
-
-        val <- dtot/hgs[['daily_max']] * 100
-        valtext <- paste(dtot, hgs[['units']])
-
-        updateF7Gauge(
-          id = ns(paste0(gauge, "-gauge")),
-          value = val,
-          valueText = valtext
-        )
-
-      }
-
       # apply updates
-      lapply(names(home_gauge_struct), updateGauge)
+      lapply(names(home_gauge_struct), function(x) {
+        updateGauge(
+          df = todaydf(),
+          time_map = sec_to_min,
+          struct = home_gauge_struct,
+          gauge = x
+        )
+      })
     })
 
     output$historylist <- renderUI({

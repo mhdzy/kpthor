@@ -120,7 +120,7 @@ mod_monitor_server <- function(id, appdata, appdate) {
     # @param ... The sprintf variables, must match order in `string`.
     #
     html_format <- function(string, ...) {
-      return(HTML(sprintf(string, ...)))
+      string %>% sprintf(...) %>% HTML()
     }
 
     plotly_format <- function(dat) {

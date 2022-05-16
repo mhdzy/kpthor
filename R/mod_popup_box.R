@@ -140,8 +140,7 @@ mod_popup_box_server <- function(id, sheet_trigger, appdata, appdate) {
       # this will toggle on the input sheet
       log_trace("[{id}] sheet (update) triggered")
       updateF7Sheet("sheet")
-    }
-    )
+    })
 
     ## oE submit btn ----
     # create observers for pstg submissions via module id's
