@@ -100,7 +100,7 @@ mod_settings_server <- function(id, appdata, appdate) {
       tagList(
         f7Row(
           f7Col(
-            width = 5,
+            width = 8,
             f7Picker(
               inputId = ns("modify_event"),
               label = "Modify Event",
@@ -109,7 +109,7 @@ mod_settings_server <- function(id, appdata, appdate) {
             )
           ),
           f7Col(
-            width = 5,
+            width = 4,
             f7Text(
               inputId = ns("modify_value"),
               label = HTML("<b>Modify Value</b>"),
