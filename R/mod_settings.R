@@ -100,27 +100,27 @@ mod_settings_server <- function(id, appdata, appdate) {
       tagList(
         f7Row(
           f7Col(
-            width = 10,
+            width = 5,
             f7Picker(
               inputId = ns("modify_event"),
               label = "Modify Event",
               placeholder = "event for 0 at 00:00",
               choices = event_choices()
             )
+          ),
+          f7Col(
+            width = 5,
+            f7Text(
+              inputId = ns("modify_value"),
+              label = HTML("<b>Modify Value</b>"),
+              value = 0L,
+              placeholder = "new value"
+            )
           )
         ),
         f7Row(
           f7Col(
             width = 10,
-            f7Text(
-              inputId = ns("modify_value"),
-              label = "Modify Value",
-              value = 0L,
-              placeholder = "new value"
-            )
-          ),
-          f7Col(
-            width = 6,
             f7Button(
               inputId = ns("modify_confirm"),
               label = "confirm",
