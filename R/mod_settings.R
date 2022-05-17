@@ -15,9 +15,7 @@ mod_settings_ui <- function(id) {
     uiOutput(ns("pwd")),
     uiOutput(ns("pets")),
     uiOutput(ns("modify")),
-    uiOutput(ns("modify_btn")),
-    uiOutput(ns("delete")),
-    uiOutput(ns("delete_btn"))
+    uiOutput(ns("delete"))
   )
 }
 
@@ -29,7 +27,7 @@ mod_settings_ui <- function(id) {
 #' @importFrom lubridate date
 #' @importFrom shiny moduleServer reactive renderUI observeEvent req
 #' @importFrom shinyMobile f7Picker f7SwipeoutItem f7Dialog f7Toast
-#' @importFrom shinyMobile f7Text
+#' @importFrom shinyMobile f7Text f7Row f7Col f7Button updateF7Text
 #'
 #' @noRd
 #'
@@ -60,6 +58,12 @@ mod_settings_server <- function(id, appdata, appdate) {
         " at ", uapply(as.numeric(as_hms(localdata()$datetime))/3600, astime)
       )
     })
+
+    mod_idx <- reactive({ which(input$modify_event == event_choices()) })
+    del_idx <- reactive({ which(input$delete_event == event_choices()) })
+
+    mod_data <- reactive({ localdata()[mod_idx(), ] })
+    del_data <- reactive({ localdata()[del_idx(), ] })
 
     output$user <- renderUI({
       log_trace("[{id}] render username box")
@@ -93,29 +97,50 @@ mod_settings_server <- function(id, appdata, appdate) {
 
     output$modify <- renderUI({
       log_trace("[{id}] render modify box")
-      f7Picker(
-        inputId = ns("modpicker"),
-        label = "Modify Event",
-        placeholder = "event for 0 at 00:00",
-        choices = event_choices()
-      )
-    })
-
-    output$modify_btn <- renderUI({
-      f7Row(
-        f7Col(
-          width = 10,
-          f7Button(
-            inputId = ns("modconfirm"),
-            label = "confirm",
-            color = "blue",
-            fill = TRUE
+      tagList(
+        f7Row(
+          f7Col(
+            width = 10,
+            f7Picker(
+              inputId = ns("modify_event"),
+              label = "Modify Event",
+              placeholder = "event for 0 at 00:00",
+              choices = event_choices()
+            )
+          )
+        ),
+        f7Row(
+          f7Col(
+            width = 10,
+            f7Text(
+              inputId = ns("modify_value"),
+              label = "Modify Value",
+              value = 0L,
+              placeholder = "new value"
+            )
+          ),
+          f7Col(
+            width = 6,
+            f7Button(
+              inputId = ns("modify_confirm"),
+              label = "confirm",
+              color = "blue",
+              fill = TRUE
+            )
           )
         )
       )
     })
 
-    observeEvent(input$modconfirm, {
+    observeEvent(input$modify_event, {
+      log_trace("[{id}] modified event changed; updating modify value")
+      updateF7Text(
+        inputId = "modify_value",
+        value = mod_data()$value
+      )
+    })
+
+    observeEvent(input$modify_confirm, {
       log_trace("[{id}] render modify confirm button")
       f7Dialog(
         id = ns("modify_dialog"),
@@ -127,33 +152,61 @@ mod_settings_server <- function(id, appdata, appdate) {
 
     observeEvent(input$modify_dialog, {
       log_trace("[{id}] modify event confirmed, modifying")
+      if (input$modify_dialog) {
+        if (!is.na(as.numeric(input$modify_value))) {
+          mod_conf <- get_golem_options("dbi")$execute(
+            paste0(
+              "update ", get_golem_options("schema"), ".", get_golem_options("table"),
+              " set value=", as.numeric(input$modify_value),
+              " where hash='", mod_data()$hash, "';"
+            )
+          )
+        } else {
+          mod_conf <- FALSE
+        }
+
+        if (mod_conf) {
+          log_trace("[{id}] modify event confirmed, modifying")
+          f7Toast(text = "Event modified successfully!", position = "bottom", closeButtonColor = "green")
+        } else {
+          log_warn("[{id}] modify failed, warning")
+          f7Toast(text = "Event modification failed.", position = "bottom", closeButtonColor = "red")
+        }
+      } else {
+        log_trace("[{id}] modify cancelled")
+        f7Toast(text = "Event modification cancelled.", position = "bottom", closeButtonColor = "yellow")
+      }
     })
 
     output$delete <- renderUI({
       log_trace("[{id}] render delete box")
-      f7Picker(
-        inputId = ns("delpicker"),
-        label = "Delete Event",
-        placeholder = "event for 0 at 00:00",
-        choices = event_choices()
-      )
-    })
-
-    output$delete_btn <- renderUI({
-      f7Row(
-        f7Col(
-          width = 10,
-          f7Button(
-            inputId = ns("delconfirm"),
-            label = "confirm",
-            color = "blue",
-            fill = TRUE
+      tagList(
+        f7Row(
+          f7Col(
+            width = 10,
+            f7Picker(
+              inputId = ns("delete_event"),
+              label = "Delete Event",
+              placeholder = "event for 0 at 00:00",
+              choices = event_choices()
+            )
+          )
+        ),
+        f7Row(
+          f7Col(
+            width = 10,
+            f7Button(
+              inputId = ns("delete_confirm"),
+              label = "confirm",
+              color = "blue",
+              fill = TRUE
+            )
           )
         )
       )
     })
 
-    observeEvent(input$delconfirm, {
+    observeEvent(input$delete_confirm, {
       log_trace("[{id}] render delete confirm button")
       f7Dialog(
         id = ns("delete_dialog"),
@@ -165,24 +218,25 @@ mod_settings_server <- function(id, appdata, appdate) {
 
     observeEvent(input$delete_dialog, {
       log_trace("[{id}] delete event confirmed, deleting")
-      row_idx <- which(input$delpicker == deletion_choices())
-      del_hash <- localdata()[row_idx, ]$hash
-      del_conf <- get_golem_options("dbi")$execute(
-        paste0(
-          "delete from ",
-          get_golem_options("schema"), ".", get_golem_options("table"),
-          " where hash='", del_hash, "';"
+      if (input$delete_dialog) {
+        del_conf <- get_golem_options("dbi")$execute(
+          paste0(
+            "delete from ", get_golem_options("schema"), ".", get_golem_options("table"),
+            " where hash='", del_data()$hash, "';"
+          )
         )
-      )
-      if (del_conf) {
-        log_trace("[{id}] delete confirmed, deleting")
-        f7Toast(text = "Event deleted successfully!", position = "bottom", closeButtonColor = "green")
+        if (del_conf) {
+          log_trace("[{id}] delete confirmed, deleting")
+          f7Toast(text = "Event deleted successfully!", position = "bottom", closeButtonColor = "green")
+        } else {
+          log_warn("[{id}] delete failed, warning")
+          f7Toast(text = "Event deletion failed.", position = "bottom", closeButtonColor = "red")
+        }
       } else {
-        log_warn("[{id}] delete failed, warning")
-        f7Toast(text = "Event deletion failed.", position = "bottom", closeButtonColor = "red")
+        log_trace("[{id}] delete cancelled")
+        f7Toast(text = "Event deletion cancelled.", position = "bottom", closeButtonColor = "yellow")
       }
     })
-
 
   })
 }
