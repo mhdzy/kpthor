@@ -174,7 +174,7 @@ if (FALSE) {
       )
 
     RES_LAPPLY_DATA <- dat
-    RES_LAPPLY_DATA <- dat |> dplyr::filter(action == "poop")
+    RES_LAPPLY_DATA <- dat |> dplyr::filter(action == "play")
 
     daterow <- function(date, data) {
       # data needs to have 'hour' and 'freq' columns
@@ -233,7 +233,7 @@ if (FALSE) {
       dplyr::pull(time)
 
     x <- as.numeric(dt_filtered$time)
-    # x <- dt_filtered$numtime[dt_filtered$numtime > 20000]
+    x <- dt_filtered$numtime[dt_filtered$numtime > 20000]
 
     # auto guess 'k' number of clusters
     result <- Ckmeans.1d.dp::Ckmeans.1d.dp(x)
