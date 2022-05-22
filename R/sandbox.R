@@ -11,6 +11,7 @@ if (FALSE) {
   library(lubridate)
   library(magrittr)
   library(purrr)
+  library(readr)
   library(stringr)
   library(tibble)
 
@@ -36,15 +37,16 @@ if (FALSE) {
   )
 
   LOAD = TRUE
-  MIGRATE = TRUE
-  PUSH_TO_DB = TRUE
-  PREPDF = TRUE
+  MIGRATE = FALSE
+  PUSH_TO_DB = FALSE
+  SAVE_TO_DISK = TRUE
+  PREPDF = FALSE
   PLOTS_GENERAL = FALSE
   HISTOGRAM = FALSE
   HEATMAP = FALSE
   CLUSTERING = FALSE
-  KDE = TRUE
-  PREDICT = TRUE
+  KDE = FALSE
+  PREDICT = FALSE
 
   if (LOAD) {
 
@@ -115,26 +117,33 @@ if (FALSE) {
     }
   }
 
+  if (SAVE_TO_DISK) {
+    df |>
+      readr::write_csv(
+        "data.csv"
+      )
+  }
+
   if (PREPDF) {
     dt <- df |>
       dplyr::mutate(
         datetime = lubridate::with_tz(datetime, "EST5EDT")
       ) |>
       dplyr::mutate(
-        day = lubridate::date(datetime),
+        date = lubridate::date(datetime),
         time = hms::as_hms(datetime),
         hour = lubridate::hour(datetime)
       ) |>
       dplyr::select(
         datetime,
-        day,
+        date,
         time,
         hour,
         action,
         value
       ) |>
       dplyr::arrange(
-        dplyr::desc(day),
+        dplyr::desc(date),
         dplyr::desc(hour)
       )
 
@@ -144,7 +153,7 @@ if (FALSE) {
          ggplot2::ggplot(aes(x = hms::as_hms(datetime), y = value, color = action)) +
          ggplot2::geom_point()
       ) |>
-        plotly::ggplotly(pDistro)
+        plotly::ggplotly()
     }
   }
 
@@ -158,23 +167,23 @@ if (FALSE) {
 
   if (HEATMAP) {
     dat <- dt |>
-      dplyr::group_by(day, action, hour) |>
+      dplyr::group_by(date, action, hour) |>
       dplyr::summarise(freq = dplyr::n()) |>
       dplyr::arrange(
-        dplyr::desc(day), dplyr::desc(hour)
+        dplyr::desc(date), dplyr::desc(hour)
       )
 
     RES_LAPPLY_DATA <- dat
     RES_LAPPLY_DATA <- dat |> dplyr::filter(action == "poop")
 
-    dayrow <- function(day, data) {
+    daterow <- function(date, data) {
       # data needs to have 'hour' and 'freq' columns
       hrs <- seq(24) - 1
       missing_hrs <- hrs[!(hrs %in% data$hour)]
-      filled_day <- dplyr::bind_rows(
+      filled_date <- dplyr::bind_rows(
         data,
         tibble::tibble(
-          day = day,
+          date = date,
           hour = missing_hrs,
           freq = 0
         )
@@ -186,23 +195,23 @@ if (FALSE) {
         ) |>
         dplyr::arrange(hour)
 
-      if (nrow(filled_day) == 24) {
-        complete_day <- matrix(filled_day$freq, nrow = 1, ncol = 24)
+      if (nrow(filled_date) == 24) {
+        complete_date <- matrix(filled_date$freq, nrow = 1, ncol = 24)
       } else {
-        complete_day <- matrix(0, nrow = 1, ncol = 24)
+        complete_date <- matrix(0, nrow = 1, ncol = 24)
       }
 
-      return(complete_day)
+      return(complete_date)
     }
 
     res <- lapply(
-      sort(unique(RES_LAPPLY_DATA$day)),
+      sort(unique(RES_LAPPLY_DATA$date)),
       function(d) {
         newdat <- RES_LAPPLY_DATA |>
-          dplyr::filter(day == d) |>
+          dplyr::filter(date == d) |>
           dplyr::group_by(hour) |>
           dplyr::summarise(freq = n())
-        return(dayrow(d, newdat))
+        return(daterow(d, newdat))
       })
 
     gdat <- t(matrix(unlist(res), nrow = 24))
@@ -372,7 +381,7 @@ if (FALSE) {
     }
 
     filterEvents <- function(date, eventdf) {
-      # need a few representations of the day/time for compatibility
+      # need a few representations of the date/time for compatibility
       today <- lubridate::date(date)
       now_min <- hms::as_hms(date)
       now_hr <- as.numeric(hms::as_hms(date))/3600 # in hours
@@ -380,7 +389,7 @@ if (FALSE) {
       return(
         eventdf |>
           filter(
-            day == today
+            date == today
           ) |>
           mutate(
             time = as.numeric(time)/3600 # in hours
@@ -489,7 +498,7 @@ if (FALSE) {
 
       mostrecent <- eventdf |>
         filter(
-          day == today,
+          date == today,
           time < now_hr
         ) |>
         mutate(
