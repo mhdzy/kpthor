@@ -6,7 +6,7 @@
 #'
 #' @noRd
 #'
-#' @importFrom shiny NS tagList uiOutput
+#' @importFrom shiny NS tagList uiOutput imageOutput
 mod_home_ui <- function(id) {
   ns <- NS(id)
   tagList(
@@ -101,7 +101,7 @@ mod_home_ui <- function(id) {
 #' @importFrom logger log_trace log_warn
 #' @importFrom lubridate hour minute
 #' @importFrom magrittr %>%
-#' @importFrom shiny moduleServer reactive renderUI observeEvent
+#' @importFrom shiny moduleServer reactive renderUI observeEvent req
 #' @importFrom shinyMobile f7Picker f7SwipeoutItem f7Dialog f7Gauge updateF7Gauge
 #' @importFrom shinyMobile f7List f7ListItem
 #'
@@ -119,12 +119,19 @@ mod_home_server <- function(id, appdata, appdate, predictions) {
       # no need to wrap in a 'change detector' as appdata() is only updated
       # if different from previously cached values
       #' @seealso `R/mod_data.R`
+      req(appdata$data())
       appdata$data() %>%
         mutate(date = lubridate::date(datetime)) %>%
         filter(date == appdate$date())
     })
 
     # used for programmatic gauge updates
+    sec_to_min <- c(
+      "out",
+      "play",
+      "walk",
+      "sleep"
+    )
     home_gauge_struct <- list(
       `food` = list(
         units = "cups",
@@ -133,15 +140,33 @@ mod_home_server <- function(id, appdata, appdate, predictions) {
       ),
       `water` = list(
         units = "cups",
-        daily_max = 5,
+        daily_max = 7,
         actions = c("water")
       ),
       `play` = list(
         units = "mins",
-        daily_max = 90,
-        actions = c("walk", "out", "play")
+        daily_max = 60,
+        actions = c("walk", "play")
       )
     )
+
+    updateGauge <- function(df, time_map, struct = home_gauge_struct, gauge) {
+      hgs <- struct[[gauge]]
+      dtot <- df %>%
+        dplyr::filter(action %in% hgs[['actions']]) %>%
+        dplyr::mutate(value = dplyr::if_else(action %in% time_map, round(value/60, 0), value)) %>%
+        dplyr::summarise(sum = sum(value)) |>
+        dplyr::pull(sum)
+
+      val <- dtot/hgs[['daily_max']] * 100
+      valtext <- paste(dtot, hgs[['units']])
+
+      updateF7Gauge(
+        id = ns(paste0(gauge, "-gauge")),
+        value = val,
+        valueText = valtext
+      )
+    }
 
     output$photo <- renderImage({
       log_trace("[{id}] updating photo")
@@ -157,36 +182,15 @@ mod_home_server <- function(id, appdata, appdate, predictions) {
     observeEvent(todaydf(), {
       log_trace("[{id}] updating gauge")
 
-      # operates in scope of the mod_home module
-      updateGauge <- function(gauge) {
-
-        sec_to_min <- c(
-          "out",
-          "play",
-          "walk",
-          "sleep"
-        )
-
-        hgs <- home_gauge_struct[[gauge]]
-        dtot <- todaydf() %>%
-          dplyr::filter(action %in% hgs[['actions']]) %>%
-          dplyr::mutate(value = dplyr::if_else(action %in% sec_to_min, round(value/60, 0), value)) %>%
-          dplyr::summarise(sum = sum(value)) |>
-          dplyr::pull(sum)
-
-        val <- dtot/hgs[['daily_max']] * 100
-        valtext <- paste(dtot, hgs[['units']])
-
-        updateF7Gauge(
-          id = ns(paste0(gauge, "-gauge")),
-          value = val,
-          valueText = valtext
-        )
-
-      }
-
       # apply updates
-      lapply(names(home_gauge_struct), updateGauge)
+      lapply(names(home_gauge_struct), function(x) {
+        updateGauge(
+          df = todaydf(),
+          time_map = sec_to_min,
+          struct = home_gauge_struct,
+          gauge = x
+        )
+      })
     })
 
     output$historylist <- renderUI({

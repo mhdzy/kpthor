@@ -60,7 +60,7 @@ mod_monitor_ui <- function(id) {
 #' @importFrom ggplot2 aes ggplot geom_point
 #' @importFrom magrittr %>%
 #' @importFrom plotly ggplotly renderPlotly
-#' @importFrom shiny moduleServer renderImage
+#' @importFrom shiny moduleServer renderImage req
 #'
 mod_monitor_server <- function(id, appdata, appdate) {
   moduleServer(id, function(input, output, session) {
@@ -71,6 +71,7 @@ mod_monitor_server <- function(id, appdata, appdate) {
     # appdate$date()
 
     today_data <- reactive({
+      req(appdata$data())
       appdata$data() %>%
         filter(lubridate::date(datetime) == appdate$date())
     })
@@ -120,7 +121,7 @@ mod_monitor_server <- function(id, appdata, appdate) {
     # @param ... The sprintf variables, must match order in `string`.
     #
     html_format <- function(string, ...) {
-      return(HTML(sprintf(string, ...)))
+      string %>% sprintf(...) %>% HTML()
     }
 
     plotly_format <- function(dat) {

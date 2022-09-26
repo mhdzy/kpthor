@@ -67,6 +67,7 @@ dbCluster <- function(date, eventdf, raw = FALSE) {
 #' @param `clusters` A list of cluster objects from Ckmeans.1d.1p
 #'
 #' @importFrom purrr flatten
+#' @importFrom stats sd
 #'
 #' @noRd
 createClusterEvents <- function(clusters) {
