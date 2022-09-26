@@ -74,6 +74,13 @@ app_ui <- function(request) {
             mod_table_ui("table")
           ),
 
+          f7Tab(
+            tabName = "report",
+            icon = f7Icon("square_list"),
+
+            mod_report_ui("report")
+          ),
+
           ## settings ----
           f7Tab(
             tabName = "settings",
