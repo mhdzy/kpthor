@@ -17,7 +17,7 @@ app_ui <- function(request) {
     f7Page(
       title = "kpthor",
       preloader = TRUE,
-      allowPWA = TRUE,
+      allowPWA = FALSE,
       loading_duration = 2L,
 
       f7TabLayout(
@@ -35,12 +35,12 @@ app_ui <- function(request) {
           f7Tab(
             tabName = "inputs",
             icon = f7Icon("calendar_badge_plus"),
-            active = TRUE,
 
             # static button inputs
-            mod_datetime_row_ui("time_vars"),
+            mod_appdate_row_ui("time_vars"),
             mod_button_action_ui("actions"),
-            br(), mod_button_input_ui("inputs"),
+            mod_button_input_ui("inputs"),
+            mod_predlist_ui("input_preds"),
 
             # popup inputs
             mod_popup_box_ui("food_vars"),
@@ -54,6 +54,16 @@ app_ui <- function(request) {
             icon = f7Icon("graph_square"),
 
             mod_monitor_ui("monitor")
+          ),
+
+
+          ## home ----
+          f7Tab(
+            tabName = "home",
+            active = TRUE,
+            icon = f7Icon("house"),
+
+            mod_home_ui("home")
           ),
 
           ## table ----
@@ -85,7 +95,7 @@ app_ui <- function(request) {
       ## options ----
       options = list(
         theme = c("ios"),
-        dark = TRUE,
+        dark = FALSE,
         filled = FALSE,
         color = "#a07aff",
         touch = list(tapHold = TRUE, tapHoldDelay = 750, iosTouchRipple = FALSE),

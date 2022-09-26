@@ -26,6 +26,9 @@ mod_data_server <- function(id, refresh_pull, refresh_tabs) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
 
+    dat_cache <- reactiveVal(get_golem_options("dbi")$query_self_param_clear(
+      get_golem_options("schema"), get_golem_options("table")
+    ))
     refresh <- reactiveVal(0L)
 
     # no observeEvent because only act on certain conditions
@@ -37,23 +40,29 @@ mod_data_server <- function(id, refresh_pull, refresh_tabs) {
       #
       # also react to tab switch, but only when the user is trying to view
       # information via 'monitor' or 'table' tabs
-      if (!is.null(refresh_pull()) || (refresh_tabs() %in% c("monitor", "table"))) {
+      if (!is.null(refresh_pull()) || (refresh_tabs() %in% c("monitor", "home", "table"))) {
         log_trace("[{id}] data needs refreshing")
         # need to use isolate to prevent this from observing itself & reacting
         isolate(refresh(refresh() + 1))
       }
     })
 
-    df_data <- eventReactive(refresh(), {
+    observeEvent(refresh(), {
       log_trace("[{id}] df refresh")
-      get_golem_options("dbi")$query_self_param_clear(
+      dat_latest <- get_golem_options("dbi")$query_self_param_clear(
         get_golem_options("schema"), get_golem_options("table")
-      )
+      ) %>%
+        dplyr::mutate(datetime = lubridate::with_tz(datetime, "EST5EDT"))
+
+      # only update data object if we get new info
+      if (!identical(dat_cache(), dat_latest)) {
+        dat_cache(dat_latest)
+      }
     })
 
     return(
       list(
-        data = reactive(df_data())
+        data = reactive(dat_cache())
       )
     )
 

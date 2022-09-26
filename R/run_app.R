@@ -27,9 +27,9 @@ run_app <- function(
       uiPattern = uiPattern
     ),
     golem_opts = list(
-      pet = "kashi",
+      pet = "Kashi",
       schema = "kpthor",
-      table = "testme",
+      table = "allevents",
       dbi = dbInterface$new(
         # drv defined in /etc/odbcinst.ini
         drv = odbc::odbc(),
@@ -39,7 +39,7 @@ run_app <- function(
       timerq = ensure_queue("timerq", db = "db/timerq"),
       time_vars = list(
         hour   = uvars(0L, 24L, 1L, lubridate::hour,   "gray"),
-        minute = uvars(0L, 60L, 1L, lubridate::minute, "gray")
+        minute = uvars(0L, 60L, 5L, lubridate::minute, "gray")
       ),
       actions = list(
         walk  = avars("walk",  "start walk",  "end walk"),
@@ -50,6 +50,36 @@ run_app <- function(
         food = c("food", "food", "green"),
         play = c("play", "play", "teal"),
         poop = c("poop", "poop", "deeporange")
+      ),
+      eventPrefix = list(
+        "food" = "ate",
+        "out" = "went",
+        "pee" = "went",
+        "play" = "went out to",
+        "poop" = "went",
+        "sleep" = "went to",
+        "walk" = "went on a",
+        "water" = "drank"
+      ),
+      predPrefix = list(
+        "food" = "eat",
+        "out" = "go",
+        "pee" = "go",
+        "play" = "go",
+        "poop" = "go",
+        "sleep" = "go to",
+        "walk" = "go on a",
+        "water" = "drink"
+      ),
+      eventIcons = list(
+        "food" = "poultry_leg",
+        "out" = "cloud_sun",
+        "pee" = "umbrella",
+        "play" = "paw",
+        "poop" = "recordingtape",
+        "sleep" = "zzz",
+        "walk" = "dog",
+        "water" = "drop"
       ),
       food_vars = list(
         food  = uvars(0L, 3L, 0.5, 1.5, "teal"),

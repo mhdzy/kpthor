@@ -366,14 +366,13 @@ dbInterface <- R6::R6Class(
     #'
     #' @importFrom DBI dbExecute
     create_if_not_exist = function() {
-      query <- "create table if not exists kpthor.events (
-        hash text,
-        date date,
-        time int,
-        minute int,
-        pet text,
-        action text,
-        value text
+      query <- "create table if not exists kpthor.allevents (
+        id serial not null,
+        hash text primary key,
+        pet text not null,
+        datetime timestamp with time zone default null,
+        action text not null,
+        value numeric(10, 2)
       );"
       self$generic(
         fn = dbExecute,
@@ -383,5 +382,6 @@ dbInterface <- R6::R6Class(
         )
       )
     }
+
   )
 )

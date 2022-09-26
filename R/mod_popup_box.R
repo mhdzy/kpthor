@@ -27,6 +27,7 @@ mod_popup_box_ui <- function(id) {
         br(),
         br(),
         f7Row(
+          style = "margin: 20px",
           f7Col(
             f7Button(
               inputId = ns("cancel"),
@@ -52,18 +53,20 @@ mod_popup_box_ui <- function(id) {
 #' @noRd
 #'
 #' @importFrom digest digest
-#' @importFrom dplyr mutate
+#' @importFrom dplyr if_else mutate
 #' @importFrom golem get_golem_options
 #' @importFrom logger log_debug log_trace log_warn
+#' @importFrom magrittr %>%
 #' @importFrom purrr map_chr
 #' @importFrom shiny is.reactive moduleServer observeEvent tagList
 #' @importFrom shiny reactiveValues reactiveValuesToList renderUI
 #' @importFrom shinyjs hide
 #' @importFrom shinyMobile f7Button f7Block f7Col f7Dialog f7Row f7Stepper
-#' @importFrom shinyMobile f7Progress updateF7Progress updateF7Sheet
-mod_popup_box_server <- function(id, sheet_trigger, datetime) {
+#' @importFrom shinyMobile f7Progress updateF7Progress updateF7Sheet f7Toast
+#'
+mod_popup_box_server <- function(id, sheet_trigger, appdata, appdate) {
   stopifnot(is.reactive(sheet_trigger))
-  stopifnot(is.list(datetime))
+  stopifnot(is.list(appdate))
 
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
@@ -133,13 +136,11 @@ mod_popup_box_server <- function(id, sheet_trigger, datetime) {
     })
 
     ## oE sheet trigger ----
-    observeEvent(
-      eventExpr = sheet_trigger(),
-      handlerExpr = {
-        # this will toggle on the input sheet
-        updateF7Sheet("sheet")
-        log_trace("[{id}] sheet triggered")
-      }
+    observeEvent(sheet_trigger(), {
+      # this will toggle on the input sheet
+      log_trace("[{id}] sheet (update) triggered")
+      updateF7Sheet("sheet")
+    }
     )
 
     ## oE submit btn ----
@@ -160,74 +161,79 @@ mod_popup_box_server <- function(id, sheet_trigger, datetime) {
     })
 
     ## oE confirm btn ----
-    observeEvent(
-      eventExpr = input$confirm,
-      handlerExpr = {
-        # grab pstg (pre-stage) values, which were submitted by user pre-confirm
-        vals <- uapply(nams, function(x) pstg[[x]])
-        idx <- which(vals != 0)
+    observeEvent(input$confirm, {
+      log_trace("[{id}] confirm button press detected")
+      # grab pstg (pre-stage) values, which were submitted by user pre-confirm
+      vals <- uapply(nams, function(x) pstg[[x]])
+      idx <- which(vals != 0)
 
-        if (length(idx)) {
-          df <- data.frame(
-            date = datetime$date(),
-            time = datetime$hour(),
-            minute = datetime$minute(),
+      if (length(idx)) {
+        min_to_sec <- c("play", "walk")
+
+        df <-
+          data.frame(
             pet = get_golem_options("pet"),
+            datetime = lubridate::with_tz(lubridate::force_tz(
+              lubridate::ymd_hms(paste0(appdate$date(), " ", appdate$hour(), ":", appdate$minute(), ":", "00")),
+              "EST5EDT"), "UTC"),
             action = nams[idx],
             value = vals[idx]
-          ) |> dplyr::mutate(
-            hash = purrr::map_chr(paste0(date, time, minute, pet, action, value), digest::digest, algo = "sha256")
+          ) %>%
+          dplyr::mutate(
+            # TODO: ensure units of 'seconds' for time-based inputs
+            value = dplyr::if_else(action %in% min_to_sec, value * 60.0, value * 1.0),
+            hash = purrr::map_chr(paste0(pet, datetime, action, value), digest::digest, algo = "sha256")
           )
 
-          currtbl <- get_golem_options("dbi")$query(
-            paste0(
-              "select * from ",
-              get_golem_options("schema"), ".", get_golem_options("table"), ";"
-            )
+        # live query to ensure we get the latest data, even if user didn't update
+        hashtbl <- get_golem_options("dbi")$query(
+          paste0(
+            "select hash from ",
+            get_golem_options("schema"), ".", get_golem_options("table"), ";"
           )
+        )
 
-          if (df$hash %in% currtbl$hash) {
-            f7Dialog(
-              id = ns("error"),
-              title = "Duplicate Event Rejected!",
-              text = "You (or your device) submitted an event which currently exists.",
-              type = "alert"
-            )
-            log_warn("[{id}] append attempt blocked with hash {df$hash}")
-          } else {
-            get_golem_options("dbi")$append(get_golem_options("schema"), get_golem_options("table"), df)
-            log_debug("[{id}] appended {nrow(df)} rows to {get_golem_options('schema')}.{get_golem_options('table')}")
-          }
-        } else {
-          # idx will have length 0 when all vals are == 0; inform user
+        # need to check 'any()' because we may have more than 1 event being added
+        if (any(df$hash %in% hashtbl$hash)) {
           f7Dialog(
-            id = ns("warn"),
-            title = "No Events Added!",
-            text = "You didn't submit any events before confirming, so nothing was recorded.",
+            id = ns("error"),
+            title = "Duplicate Event Rejected!",
+            text = "You (or your device) submitted an event which currently exists.",
             type = "alert"
           )
+          log_warn("[{id}] append attempt blocked with hash {df$hash}")
+        } else {
+          get_golem_options("dbi")$append(get_golem_options("schema"), get_golem_options("table"), df)
+          log_debug("[{id}] appended {nrow(df)} rows to {get_golem_options('schema')}.{get_golem_options('table')}")
+          f7Toast(text = "Event added successfully!", position = "bottom", closeButtonColor = "green")
         }
-
-        hide("sheet")
-        log_trace("[{id}] sheet hidden by confirm")
-
-        # reset after hide so user doesn't see
-        pstg_reset()
-        log_trace("[{id}] pstg zeroed out")
+      } else {
+        # idx will have length 0 when all vals are == 0; inform user
+        f7Dialog(
+          id = ns("warn"),
+          title = "No Events Added!",
+          text = "You didn't submit any events before confirming, so nothing was recorded.",
+          type = "alert"
+        )
       }
-    )
+
+      hide("sheet")
+      log_trace("[{id}] sheet hidden by confirm")
+
+      # reset after hide so user doesn't see
+      pstg_reset()
+      log_trace("[{id}] pstg zeroed out")
+    })
 
     ## oE cancel btn ----
-    observeEvent(
-      eventExpr = input$cancel,
-      handlerExpr = {
-        hide("sheet")
-        log_trace("[{id}] sheet hidden by cancel")
+    observeEvent(input$cancel, {
+      hide("sheet")
+      log_trace("[{id}] sheet hidden by cancel")
 
-        # reset after hide so user doesn't see
-        pstg_reset()
-        log_trace("[{id}] pstg zeroed out")
-      }
+      # reset after hide so user doesn't see
+      pstg_reset()
+      log_trace("[{id}] pstg zeroed out")
+    }
     )
 
   })

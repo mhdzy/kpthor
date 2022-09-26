@@ -37,7 +37,6 @@ usethis::use_package( "RPostgres" )
 usethis::use_package( "shiny" )
 usethis::use_package( "shinyjs" )
 usethis::use_package( "shinyMobile" )
-usethis::use_package( "shinyWidgets" )
 usethis::use_package( "stringi" )
 usethis::use_package( "tibble" )
 usethis::use_package( "tidyselect" )
@@ -55,20 +54,24 @@ golem::add_module( name = "navbar" )
 
 golem::add_module( name = "button_action" )
 golem::add_module( name = "button_input" )
+golem::add_module( name = "predlist" )
 
-golem::add_module( name = "datetime_row" )
+golem::add_module( name = "appdate_row" )
 golem::add_module( name = "popup_box" )
 
 golem::add_module( name = "monitor" )
 golem::add_module( name = "table" )
-golem::add_module( name = "report" )
+golem::add_module( name = "home" )
 
+golem::add_module( name = "predictions" )
 golem::add_module( name = "settings" )
 
 ## Add helper functions ----
 ## Creates fct_* and utils_*
 golem::add_fct( "db" )
 
+golem::add_utils( "db-migrate" )
+golem::add_utils( "db-cluster" )
 golem::add_utils( "vars" )
 
 ## External resources
@@ -77,6 +80,8 @@ golem::add_js_file( "script" )
 golem::add_js_handler( "handlers" )
 
 golem::add_css_file( "popup" )
+golem::add_css_file( "photo" )
+golem::add_css_file( "times" )
 
 ## Add internal datasets ----
 ## If you have data in your package
