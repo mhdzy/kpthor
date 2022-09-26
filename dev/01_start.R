@@ -33,6 +33,7 @@ golem::set_golem_options()
 
 ## Create Common Files ----
 ## See ?usethis for more information
+usethis::use_agpl3_license( )
 usethis::use_mit_license( "MH ZYXW" )  # You can set another license here
 usethis::use_readme_rmd( open = FALSE )
 usethis::use_code_of_conduct()
@@ -51,7 +52,7 @@ golem::use_recommended_deps()
 
 ## Favicon ----
 # If you want to change the favicon (default is golem's one)
-golem::use_favicon(path = "inst/app/www/favicon.ico") # path = "path/to/ico". Can be an online file.
+golem::use_favicon(path = "www/favicon.ico") # path = "path/to/ico". Can be an online file.
 golem::remove_favicon()
 
 ## Add helper functions ----

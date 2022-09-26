@@ -3,20 +3,26 @@ Title: KP Thor
 Version: 0.0.0.9000
 Authors@R: person('MH', 'ZYXW', email = 'mhzyxw@gmail.com', role = c('cre', 'aut'))
 Description: A PWA to track your pet.
-License: MIT + file LICENSE
+License: AGPL (>= 3)
 Imports: 
+    base,
     config (>= 0.3.1),
     DBI,
+    digest,
     dplyr,
     DT,
+    ggplot2,
     golem (>= 0.3.1),
+    htmltools,
     liteq,
     logger,
     lubridate,
     magrittr,
     odbc,
     pkgload,
+    plotly,
     processx,
+    purrr,
     R6,
     renv,
     rlang,

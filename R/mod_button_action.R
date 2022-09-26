@@ -20,7 +20,7 @@ mod_button_action_ui <- function(id) {
 #'
 #' @noRd
 #'
-#' @importFrom liteq ack consume is_empty list_messages publish try_consume
+#' @importFrom liteq ack consume is_empty list_messages list_failed_messages requeue_failed_messages publish try_consume
 #' @importFrom logger log_trace
 #' @importFrom lubridate seconds_to_period hour minute second seconds
 #' @importFrom shiny moduleServer tagList observe observeEvent reactive
@@ -53,12 +53,23 @@ mod_button_action_server <- function(id, datetime) {
       isolate({
         timerq <- get_golem_options("timerq")
         if (!is_empty(timerq)) {
-          # fetch message from queue to parse and immediately republish fetched message to the queue
-          msg <- try_consume(timerq)
-          publish(timerq, title = msg$title, message = msg$message)
+          msg <- liteq::try_consume(timerq)
+
+          if (is.null(msg)) {
+            # need to fix queue and try again
+            if (nrow(liteq::list_failed_messages(timerq))) {
+              liteq::requeue_failed_messages(timerq)
+              msg <- liteq::try_consume(timerq)
+            } else {
+              stop("non-empty liteq queue 'timerq' with no FAILED messages is returning NULL")
+            }
+          }
+
+          # republish fetched message to the queue before acknowledging old msg
+          liteq::publish(timerq, title = msg$title, message = msg$message)
 
           # acknowledge "working" message from queue for safe removal of object
-          ack(msg)
+          liteq::ack(msg)
 
           # if msg contains a timer we aren't tracking, update our mode
           if (active_timer_mode() != msg$title) active_timer_mode(msg$title)
@@ -183,13 +194,14 @@ mod_button_action_server <- function(id, datetime) {
       timerq <- get_golem_options("timerq")
 
       type <-
-        if (identical("", active_timer_mode())) {
-          "new"
-        } else if (identical(button_pressed(), active_timer_mode())) {
-          "same"
-        } else { # !identical(button_pressed(), active_timer_mode())
-          "swap"
-        }
+      if (identical("", active_timer_mode())) {
+        "new"
+      } else if (identical(button_pressed(), active_timer_mode())) {
+        "same"
+      } else {
+        # !identical(button_pressed(), active_timer_mode())
+        "swap"
+      }
 
       if (type == "same" || type == "swap") {
         mode <- isolate(active_timer_mode())
@@ -203,12 +215,32 @@ mod_button_action_server <- function(id, datetime) {
           pet = get_golem_options("pet"),
           action = mode,
           value = time
+        ) |> dplyr::mutate(
+          hash = purrr::map_chr(paste0(date, time, minute, pet, action, value), digest::digest, algo = "sha256")
         )
-        get_golem_options("dbi")$append("kpthor", "events", df)
-        log_debug("[{id}] appended ", nrow(df), " rows to kpthor.events")
+
+        currtbl <- get_golem_options("dbi")$query(
+          paste0(
+            "select * from ",
+            get_golem_options("schema"), ".", get_golem_options("table"), ";"
+          )
+        )
+
+        if (df$hash %in% currtbl$hash) {
+          f7Dialog(
+            id = ns("error"),
+            title = "Duplicate Event Rejected!",
+            text = "You (or your device) submitted an event which currently exists.",
+            type = "alert"
+          )
+          log_warn("[{id}] append attempt blocked with hash {df$hash}")
+        } else {
+          get_golem_options("dbi")$append(get_golem_options("schema"), get_golem_options("table"), df)
+          log_debug("[{id}] appended ", nrow(df), " rows to {get_golem_options('schema')}.{get_golem_options('table')}")
+        }
 
         # remove the active timer mode from the queue to "stop" the timer
-        ack(try_consume(timerq))
+        liteq::ack(try_consume(timerq))
         active_timer_mode("")
         active_timer_time(0)
         updateF7Button(
@@ -232,8 +264,8 @@ mod_button_action_server <- function(id, datetime) {
 
     return(
       list(
-        walk  = reactive(input$walk),
-        out   = reactive(input$out),
+        walk = reactive(input$walk),
+        out = reactive(input$out),
         sleep = reactive(input$sleep)
       )
     )

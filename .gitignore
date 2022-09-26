@@ -5,8 +5,14 @@
 .httr-oauth
 .DS_Store
 
+# .md is displayed on github
+README.html
+
 # ignore tmp db storage
 db/
 
-# ignore published .dcf records
+# published .dcf records
 rsconnect/
+
+# vscode stuff
+.vscode/

@@ -28,6 +28,8 @@ run_app <- function(
     ),
     golem_opts = list(
       pet = "kashi",
+      schema = "kpthor",
+      table = "testme",
       dbi = dbInterface$new(
         # drv defined in /etc/odbcinst.ini
         drv = odbc::odbc(),

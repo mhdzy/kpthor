@@ -15,16 +15,22 @@
 
 ## Dependencies ----
 ## Add one line by package you want to add as dependency
+usethis::use_package( "base" )
 usethis::use_package( "DBI" )
+usethis::use_package( "digest" )
 usethis::use_package( "DT" )
 usethis::use_package( "covr" , type = "suggests" )
 usethis::use_package( "devtools" , type = "suggests" )
 usethis::use_package( "dplyr" )
+usethis::use_package( "ggplot2" )
+usethis::use_package( "htmltools" )
 usethis::use_package( "keyring" )
 usethis::use_package( "liteq" )
 usethis::use_package( "logger" )
 usethis::use_package( "lubridate" )
 usethis::use_package( "magrittr" )
+usethis::use_package( "plotly" )
+usethis::use_package( "purrr" )
 usethis::use_package( "R6" )
 usethis::use_package( "renv" )
 usethis::use_package( "RPostgres" )
@@ -35,12 +41,15 @@ usethis::use_package( "shinyWidgets" )
 usethis::use_package( "stringi" )
 usethis::use_package( "tibble" )
 usethis::use_package( "tidyselect" )
+usethis::use_package( "utils" )
 
 ## Dependency Management ----
 renv::snapshot(type = "explicit")
 
 ## Add modules ----
 ## Create a module infrastructure in R/
+golem::add_module( name = "data" )
+
 golem::add_module( name = "inputs" )
 golem::add_module( name = "navbar" )
 
@@ -52,6 +61,7 @@ golem::add_module( name = "popup_box" )
 
 golem::add_module( name = "monitor" )
 golem::add_module( name = "table" )
+golem::add_module( name = "report" )
 
 golem::add_module( name = "settings" )
 
@@ -60,7 +70,6 @@ golem::add_module( name = "settings" )
 golem::add_fct( "db" )
 
 golem::add_utils( "vars" )
-golem::add_utils( "datetime" )
 
 ## External resources
 ## Creates .js and .css files at inst/app/www

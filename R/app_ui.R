@@ -17,7 +17,8 @@ app_ui <- function(request) {
     f7Page(
       title = "kpthor",
       preloader = TRUE,
-      loading_duration = 3,
+      allowPWA = TRUE,
+      loading_duration = 2L,
 
       f7TabLayout(
         navbar = f7Navbar(
@@ -52,8 +53,22 @@ app_ui <- function(request) {
             tabName = "monitor",
             icon = f7Icon("graph_square"),
 
-            mod_monitor_ui("monitor"),
+            mod_monitor_ui("monitor")
+          ),
+
+          ## table ----
+          f7Tab(
+            tabName = "table",
+            icon = f7Icon("table_badge_more"),
+
             mod_table_ui("table")
+          ),
+
+          f7Tab(
+            tabName = "report",
+            icon = f7Icon("square_list"),
+
+            mod_report_ui("report")
           ),
 
           ## settings ----
@@ -101,6 +116,13 @@ golem_add_external_resources <- function() {
 
   tags$head(
     favicon(),
+
+    tags$link(rel = "icon", href = "favicon.ico"),
+    tags$link(rel = "shortcut icon", href = "favicon.ico"),
+    tags$link(rel = "apple-touch-icon", sizes = "180x180", href = "favicon.ico"),
+    tags$link(rel = "icon", type = "image/png", sizes = "64x64", href = "ios/64x64.png"),
+    tags$link(rel = "icon", type = "image/png", sizes = "32x32", href = "ios/32x32.png"),
+
     bundle_resources(
       path = app_sys('app/www'),
       app_title = 'kpthor'

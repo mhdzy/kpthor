@@ -51,8 +51,11 @@ mod_popup_box_ui <- function(id) {
 #'
 #' @noRd
 #'
+#' @importFrom digest digest
+#' @importFrom dplyr mutate
 #' @importFrom golem get_golem_options
-#' @importFrom logger log_debug log_trace
+#' @importFrom logger log_debug log_trace log_warn
+#' @importFrom purrr map_chr
 #' @importFrom shiny is.reactive moduleServer observeEvent tagList
 #' @importFrom shiny reactiveValues reactiveValuesToList renderUI
 #' @importFrom shinyjs hide
@@ -172,10 +175,29 @@ mod_popup_box_server <- function(id, sheet_trigger, datetime) {
             pet = get_golem_options("pet"),
             action = nams[idx],
             value = vals[idx]
+          ) |> dplyr::mutate(
+            hash = purrr::map_chr(paste0(date, time, minute, pet, action, value), digest::digest, algo = "sha256")
           )
 
-          get_golem_options("dbi")$append("kpthor", "events", df)
-          log_debug("[{id}] appended ", nrow(df), " rows to kpthor.events")
+          currtbl <- get_golem_options("dbi")$query(
+            paste0(
+              "select * from ",
+              get_golem_options("schema"), ".", get_golem_options("table"), ";"
+            )
+          )
+
+          if (df$hash %in% currtbl$hash) {
+            f7Dialog(
+              id = ns("error"),
+              title = "Duplicate Event Rejected!",
+              text = "You (or your device) submitted an event which currently exists.",
+              type = "alert"
+            )
+            log_warn("[{id}] append attempt blocked with hash {df$hash}")
+          } else {
+            get_golem_options("dbi")$append(get_golem_options("schema"), get_golem_options("table"), df)
+            log_debug("[{id}] appended {nrow(df)} rows to {get_golem_options('schema')}.{get_golem_options('table')}")
+          }
         } else {
           # idx will have length 0 when all vals are == 0; inform user
           f7Dialog(
