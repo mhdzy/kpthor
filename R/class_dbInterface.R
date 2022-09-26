@@ -6,12 +6,16 @@
 #'
 #' @return The return value, if any, from executing the function.
 #'
+#' @importFrom logger log_trace
 #' @importFrom DBI Id dbConnect dbDisconnect
 #' @importFrom DBI dbGetQuery dbExecute dbCreateTable dbWriteTable
 #' @importFrom R6 R6Class
 #' @importFrom stringi stri_replace_all
 #'
 #' @noRd
+#'
+#' @seealso prevents noRd error
+#'
 dbInterface <- R6::R6Class(
   classname = "dbInterface",
 
@@ -99,6 +103,7 @@ dbInterface <- R6::R6Class(
           self$get("dsn")
         )
       )
+      log_trace("[dbi] connected to DSN '{self$get('dsn')}'")
       invisible(self)
     },
 
@@ -108,6 +113,7 @@ dbInterface <- R6::R6Class(
     #'
     disconnect = function() {
       dbDisconnect(self$get("con"))
+      log_trace("[dbi] disconnected from DSN '{self$get('dsn')}'")
       invisible(self)
     },
 
@@ -204,7 +210,7 @@ dbInterface <- R6::R6Class(
         fn = dbExecute,
         params = list(
           conn = self$get("con"),
-          statement = s,
+          statement = s
         )
       )
     },
@@ -360,13 +366,13 @@ dbInterface <- R6::R6Class(
     #'
     #' @importFrom DBI dbExecute
     create_if_not_exist = function() {
-      query <- "create table if not exists kpthor.events (
-        date date,
-        time int,
-        minute int,
-        pet text,
-        action text,
-        value text
+      query <- "create table if not exists kpthor.allevents (
+        id serial not null,
+        hash text primary key,
+        pet text not null,
+        datetime timestamp with time zone default null,
+        action text not null,
+        value numeric(10, 2)
       );"
       self$generic(
         fn = dbExecute,
@@ -376,5 +382,6 @@ dbInterface <- R6::R6Class(
         )
       )
     }
+
   )
 )

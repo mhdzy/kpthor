@@ -1,0 +1,13 @@
+.pet_photo {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 10px solid #7f7f7f;
+  border-radius: 50%;
+  width: 150px;
+  height: 150px;
+}
+
+.pet_photo img {
+  height: 80%;
+}

@@ -40,7 +40,22 @@ declare_global_variables <- function() {
       c(
         # mod_table_server : <anonymous>:
         "pet",
-        "time"
+        "time",
+        "action",
+        "hash",
+        "total",
+        "value",
+        # candidateClusters
+        "mean",
+        "sd",
+        "type",
+        # dbCluster
+        # dbMigrate
+        # mod_button_action_server : <anonymous>:
+        "datetime",
+        # filterEvents
+        # prevEvents
+        "day"
       )
     )
   )

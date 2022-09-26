@@ -7,7 +7,8 @@
 #'
 #' @importFrom golem get_golem_options
 #' @importFrom shiny tagList h2
-#' @importFrom shinyMobile f7Page f7TabLayout f7Navbar f7Tabs f7Tab f7Icon f7DatePicker
+#' @importFrom shinyMobile f7Page f7Navbar f7TabLayout f7Tabs f7Tab
+#' @importFrom shinyMobile f7Icon f7DatePicker
 app_ui <- function(request) {
   tagList(
 
@@ -15,6 +16,9 @@ app_ui <- function(request) {
 
     f7Page(
       title = "kpthor",
+      preloader = TRUE,
+      allowPWA = FALSE,
+      loading_duration = 2L,
 
       f7TabLayout(
         navbar = f7Navbar(
@@ -23,17 +27,20 @@ app_ui <- function(request) {
 
         f7Tabs(
           id = "f7_tabs",
+          animated = FALSE,
+          swipeable = TRUE,
+          style = "toolbar",
 
           ## inputs ----
           f7Tab(
             tabName = "inputs",
             icon = f7Icon("calendar_badge_plus"),
-            active = TRUE,
 
             # static button inputs
-            mod_datetime_row_ui("time_vars"),
+            mod_appdate_row_ui("time_vars"),
             mod_button_action_ui("actions"),
-            br(), mod_button_input_ui("inputs"),
+            mod_button_input_ui("inputs"),
+            mod_predlist_ui("input_preds"),
 
             # popup inputs
             mod_popup_box_ui("food_vars"),
@@ -46,8 +53,32 @@ app_ui <- function(request) {
             tabName = "monitor",
             icon = f7Icon("graph_square"),
 
-            mod_monitor_ui("monitor"),
+            mod_monitor_ui("monitor")
+          ),
+
+
+          ## home ----
+          f7Tab(
+            tabName = "home",
+            active = TRUE,
+            icon = f7Icon("house"),
+
+            mod_home_ui("home")
+          ),
+
+          ## table ----
+          f7Tab(
+            tabName = "table",
+            icon = f7Icon("table_badge_more"),
+
             mod_table_ui("table")
+          ),
+
+          f7Tab(
+            tabName = "report",
+            icon = f7Icon("square_list"),
+
+            mod_report_ui("report")
           ),
 
           ## settings ----
@@ -61,11 +92,12 @@ app_ui <- function(request) {
         )
       ),
 
+      ## options ----
       options = list(
         theme = c("ios"),
-        dark = TRUE,
+        dark = FALSE,
         filled = FALSE,
-        color = "#007aff",
+        color = "#a07aff",
         touch = list(tapHold = TRUE, tapHoldDelay = 750, iosTouchRipple = FALSE),
         navbar = list(iosCenterTitle = FALSE, hideNavOnPageScroll = TRUE),
         toolbar = list(hideNavOnPageScroll = FALSE),
@@ -94,6 +126,13 @@ golem_add_external_resources <- function() {
 
   tags$head(
     favicon(),
+
+    tags$link(rel = "icon", href = "favicon.ico"),
+    tags$link(rel = "shortcut icon", href = "favicon.ico"),
+    tags$link(rel = "apple-touch-icon", sizes = "180x180", href = "favicon.ico"),
+    tags$link(rel = "icon", type = "image/png", sizes = "64x64", href = "ios/64x64.png"),
+    tags$link(rel = "icon", type = "image/png", sizes = "32x32", href = "ios/32x32.png"),
+
     bundle_resources(
       path = app_sys('app/www'),
       app_title = 'kpthor'

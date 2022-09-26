@@ -28,22 +28,25 @@ mod_navbar_server <- function(id) {
     ns <- session$ns
 
     output$message <- renderUI({
+      log_trace("[{id}] render navbar message")
       local <- hour(Sys.time())
       greeting <-
-        if (0 <= local && local < 12) {
-          "morning"
+        if (identical("development", Sys.getenv("GOLEM_CONFIG_ACTIVE"))) {
+          "dev mode"
+        } else if (0 <= local && local < 12) {
+          "Morning"
         } else if (12 <= local && local < 18) {
-          "afternoon"
+          "Afternoon"
         } else if (18 <= local && local < 20) {
-          "evening"
+          "Evening"
         } else if (20 <= local && local <= 24) {
-          "night"
+          "Night"
         } else {
           "<sys err>"
         }
-     log_trace("{id} time-of-day greeting found: '{local}', '{greeting}'")
+      log_trace("[{id}] time-of-day greeting found: '{local}', '{greeting}'")
 
-      h2(paste0("good ", greeting, ", ", get_golem_options("pet"), "."))
+      h2(paste0("Good ", greeting, ", ", get_golem_options("pet"), "."))
     })
 
   })

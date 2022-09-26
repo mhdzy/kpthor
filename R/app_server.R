@@ -5,27 +5,43 @@
 #'
 #' @noRd
 #'
+#' @importFrom future plan multicore
 #' @importFrom logger log_threshold log_layout layout_glue_colors TRACE
+#' @importFrom shiny reactive
+#'
 app_server <- function( input, output, session ) {
+  renv::settings$ignored.packages("kpthor")
+  future::plan(future::multicore)
+
   log_threshold(TRACE)
   log_layout(layout_glue_colors)
+
+  # enables caching of browser session; opens app to duplicate events. incompatible
+  # with active timers as reconnection will resend all inputs, interfering with
+  # the timer mechanicsms
+  # session$allowReconnect(TRUE)
 
   refresh_pull <- reactive(input$ptr)
   refresh_tabs <- reactive(input$f7_tabs)
 
+  appdata <- mod_data_server("data", refresh_pull, refresh_tabs)
+
   mod_navbar_server("navbar")
 
-  datetime <- mod_datetime_row_server("time_vars")
-  action_row <- mod_button_action_server("actions", datetime)
+  appdate <- mod_appdate_row_server("time_vars")
+  action_row <- mod_button_action_server("actions", appdata, appdate)
   input_row <- mod_button_input_server("inputs")
 
-  mod_popup_box_server("food_vars", input_row$food, datetime)
-  mod_popup_box_server("play_vars", input_row$play, datetime)
-  mod_popup_box_server("poop_vars", input_row$poop, datetime)
+  # event predictions, cluster based std. deviation ranges
+  predictions <- mod_predictions_server("predictions", appdata, appdate)
+  mod_predlist_server("input_preds", appdata, appdate, predictions)
 
-  mod_table_server("table", refresh_pull, refresh_tabs, datetime)
+  mod_popup_box_server("food_vars", input_row$food, appdata, appdate)
+  mod_popup_box_server("play_vars", input_row$play, appdata, appdate)
+  mod_popup_box_server("poop_vars", input_row$poop, appdata, appdate)
 
-  mod_monitor_server("monitor")
-  mod_settings_server("settings")
-
+  mod_monitor_server("monitor", appdata, appdate)
+  mod_home_server("home", appdata, appdate, predictions)
+  mod_table_server("table", appdata, appdate)
+  mod_settings_server("settings", appdata, appdate)
 }
