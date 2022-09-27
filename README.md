@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# { kpthor } <img src="www/favicon.ico" align="right" width="120"/>
+# { kpthor } <img src="inst/app/www/favicon.ico" align="right" width="120"/>
 
 <!-- badges: start -->
 
